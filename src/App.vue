@@ -5,6 +5,7 @@
 <script>
 import Map3d from "@/utils/Map3d.js";
 import TWEEN from "@tweenjs/tween.js";
+import gsap from "gsap";
 import * as THREE from "three";
 import { GUI } from "three/examples/jsm/libs/lil-gui.module.min.js";
 import { onBeforeUnmount, onMounted } from "vue";
@@ -17,7 +18,7 @@ import useMapMarkedLightPillar from "@/hooks/map/useMapMarkedLightPillar";
 import useSequenceFrameAnimate from "@/hooks/useSequenceFrameAnimate";
 import useCSS2DRender from "@/hooks/useCSS2DRender";
 
-let centerXY = [106.59893798828125, 26.918846130371094];
+let centerXY = [104.114129, 7.550339];
 
 export default {
   name: "3dMap30",
@@ -53,18 +54,22 @@ export default {
     textureMap.wrapT = texturefxMap.wrapT = THREE.RepeatWrapping;
     textureMap.flipY = texturefxMap.flipY = false;
     textureMap.rotation = texturefxMap.rotation = THREE.MathUtils.degToRad(45);
-    const scale = 0.128;
+    const scale = 0.0;
     textureMap.repeat.set(scale, scale);
     texturefxMap.repeat.set(scale, scale);
+
+    const color = new THREE.Color("#29445d");
+
     const topFaceMaterial = new THREE.MeshPhongMaterial({
-      map: textureMap,
-      color: 0xb4eeea,
+      // 贴图或者纯色
+      // map: textureMap,
+      color,
       combine: THREE.MultiplyOperation,
       transparent: true,
       opacity: 1,
     });
     const sideMaterial = new THREE.MeshLambertMaterial({
-      color: 0x123024,
+      color: "#ffffff",
       transparent: true,
       opacity: 0.9,
     });
@@ -73,9 +78,9 @@ export default {
     const initGui = () => {
       const gui = new GUI();
       const guiParams = {
-        topColor: "#b4eeea",
-        sideColor: "#123024",
-        scale: 0.1,
+        topColor: "#29445d",
+        sideColor: "#ffffff",
+        // scale: 0.0,
       };
       gui.addColor(guiParams, "topColor").onChange((val) => {
         topFaceMaterial.color = new THREE.Color(val);
@@ -83,10 +88,10 @@ export default {
       gui.addColor(guiParams, "sideColor").onChange((val) => {
         sideMaterial.color = new THREE.Color(val);
       });
-      gui.add(guiParams, "scale", 0, 1).onChange((val) => {
-        textureMap.repeat.set(val, val);
-        texturefxMap.repeat.set(val, val);
-      });
+      // gui.add(guiParams, "scale", 0, 1).onChange((val) => {
+      //   textureMap.repeat.set(val, val);
+      //   texturefxMap.repeat.set(val, val);
+      // });
     };
     // 初始化旋转光圈
     const initRotatingAperture = (scene, width) => {
@@ -120,10 +125,10 @@ export default {
     };
     // 初始化背景
     const initSceneBg = (scene, width) => {
-      let plane = new THREE.PlaneBufferGeometry(width * 4, width * 4);
-      let material = new THREE.MeshPhongMaterial({
+      let plane = new THREE.PlaneBufferGeometry(width * 3, width * 3);
+      let material = new THREE.MeshBasicMaterial({
         // color: 0x061920,
-        color: 0xffffff,
+        // color: 0xffffff,
         map: sceneBg,
         transparent: true,
         opacity: 1,
@@ -133,6 +138,7 @@ export default {
       let mesh = new THREE.Mesh(plane, material);
       mesh.position.set(...centerXY, bottomZ - 0.2);
       scene.add(mesh);
+      scene.fog = new THREE.Fog(0xffffff, 2, 90);
     };
     // 初始化原点
     const initCirclePoint = (scene, width) => {
@@ -219,7 +225,7 @@ export default {
         return false;
       }
       // 创建光柱
-      let heightScaleFactor = 0.4 + random(1, 5) / 5;
+      let heightScaleFactor = 1 + random(1, 5) / 5;
       let lightCenter = properties.centroid || properties.center;
       let light = createLightPillar(...lightCenter, heightScaleFactor);
       light.position.z = 0.31;
@@ -236,9 +242,10 @@ export default {
       let labelCenter = properties.center; //centroid || properties.center
       label.show(properties.name, new THREE.Vector3(...labelCenter, 0.31));
     };
+
     onMounted(async () => {
       // 四川数据
-      let provinceData = await requestData("./data/map/四川省.json");
+      let provinceData = await requestData("./data/map/中华人民共和国.json");
       provinceData = transfromGeoJSON(provinceData);
 
       class CurrentMap3d extends Map3d {
@@ -251,22 +258,48 @@ export default {
           // 设置45°的透视相机,更符合人眼观察
           this.camera = new THREE.PerspectiveCamera(45, rate, 0.001, 90000000);
           this.camera.up.set(0, 0, 1);
-          // 贵州
-          // this.camera.position.set(105.96420078859111, 20.405756412693812, 5.27483892390678) //相机在Three.js坐标系中的位置
-          // 四川
-          this.camera.position.set(
-            102.97777217804006,
-            17.660260562607277,
-            8.029548316292933
-          ); //相机在Three.js坐标系中的位置
+          // 中国地图
+          this.camera.position.set(102.49, 11.97, 42.95); //相机在Three.js坐标系中的位置
           this.camera.lookAt(...centerXY, 0);
         }
+        // 使用 GSAP 控制相机位置变化
+        startEntranceAnimation() {
+          gsap.to(this.mapGroup.children, {
+            opacity: 1, // 目标透明度
+            duration: 2, // 动画持续时间
+            delay: 5, // 延迟一定时间后开始动画
+            // stagger: 0.1, // 每个元素动画之间的延迟时间
+            ease: "power2.inOut", // 缓动函数
+          });
+
+          const targetPosition = new THREE.Vector3(...centerXY, 0);
+          // 使用 GSAP 控制相机位置变化
+          gsap.to(this.camera.position, {
+            x: 105.54, // 相机目标 x 坐标
+            y: 21.36, // 相机目标 y 坐标
+            z: 52.69, // 相机目标 z 坐标
+            delay: 0.3, // 延迟一定时间后开始动画
+            duration: 1, // 动画持续时间
+            ease: "power2.inOut", // 缓动函数
+            onUpdate: () => {
+              this.camera.lookAt(targetPosition);
+            },
+          });
+
+          gsap.to(this.scene.fog, {
+            far: 1000,
+            duration: 1,
+            delay: 0.3,
+            ease: "power2.inOut", // 缓动函数
+          });
+        }
+
         initModel() {
           try {
             // 创建组
             this.mapGroup = new THREE.Group();
             // 标签 初始化
-            this.css2dRender = initCSS2DRender(this.options, this.container);
+            // this.css2dRender = initCSS2DRender(this.options, this.container);
 
             provinceData.features.forEach((elem) => {
               // 定一个省份对象
@@ -290,7 +323,7 @@ export default {
                   }
                   // 拉伸设置
                   const extrudeSettings = {
-                    depth: 0.2,
+                    depth: 1,
                     bevelEnabled: true,
                     bevelSegments: 1,
                     bevelThickness: 0.1,
@@ -303,26 +336,28 @@ export default {
                     topFaceMaterial,
                     sideMaterial,
                   ]);
+                  mesh.material.opacity = 0; // 初始透明度为 0
                   province.add(mesh);
                 });
               });
+              // 将每个省份的地图对象添加到总的地图组 mapGroup 中
               this.mapGroup.add(province);
               // 创建标点和标签
               initLightPoint(properties, this.mapGroup);
-              initLabel(properties, this.scene);
+              // initLabel(properties, this.scene);
             });
             // 创建上下边框
             initBorderLine(provinceData, this.mapGroup);
 
             let earthGroupBound = getBoundingBox(this.mapGroup);
-            centerXY = [earthGroupBound.center.x, earthGroupBound.center.y];
+            centerXY = [earthGroupBound.center.x, earthGroupBound.center.y + 8];
             let { size } = earthGroupBound;
             let width = size.x < size.y ? size.y + 1 : size.x + 1;
             // 添加背景，修饰元素
-            this.rotatingApertureMesh = initRotatingAperture(this.scene, width);
-            this.rotatingPointMesh = initRotatingPoint(this.scene, width - 2);
+            // this.rotatingApertureMesh = initRotatingAperture(this.scene, width);
+            // this.rotatingPointMesh = initRotatingPoint(this.scene, width - 2);
             initCirclePoint(this.scene, width);
-            initSceneBg(this.scene, width);
+            initSceneBg(this.scene, 40);
 
             // 将组添加到场景中
             this.scene.add(this.mapGroup);
@@ -362,6 +397,9 @@ export default {
             this.loop();
           });
           // 这里是你自己业务上需要的code
+          // 在每一帧渲染之后获取相机的实时位置
+          var cameraPosition = this.camera.position.clone();
+          console.log("Camera Position:", cameraPosition);
           this.renderer.render(this.scene, this.camera);
           // 控制相机旋转缩放的更新
           if (this.options.controls.visibel && this.controls) {
@@ -370,26 +408,26 @@ export default {
           }
           // 统计更新
           if (this.options.statsVisibel) this.stats.update();
-          if (this.rotatingApertureMesh) {
-            this.rotatingApertureMesh.rotation.z += 0.0005;
-          }
-          if (this.rotatingPointMesh) {
-            this.rotatingPointMesh.rotation.z -= 0.0005;
-          }
+          // if (this.rotatingApertureMesh) {
+          //   this.rotatingApertureMesh.rotation.z += 0.0005;
+          // }
+          // if (this.rotatingPointMesh) {
+          //   this.rotatingPointMesh.rotation.z -= 0.0005;
+          // }
           // 渲染标签
           if (this.css2dRender) {
             this.css2dRender.render(this.scene, this.camera);
           }
           // 粒子上升
-          if (this.particleArr.length) {
-            for (let i = 0; i < this.particleArr.length; i++) {
-              this.particleArr[i].updateSequenceFrame();
-              this.particleArr[i].position.z += 0.01;
-              if (this.particleArr[i].position.z >= 6) {
-                this.particleArr[i].position.z = -6;
-              }
-            }
-          }
+          // if (this.particleArr.length) {
+          //   for (let i = 0; i < this.particleArr.length; i++) {
+          //     this.particleArr[i].updateSequenceFrame();
+          //     this.particleArr[i].position.z += 0.01;
+          //     if (this.particleArr[i].position.z >= 6) {
+          //       this.particleArr[i].position.z = -6;
+          //     }
+          //   }
+          // }
           TWEEN.update();
           // console.log(this.camera.position)
         }
@@ -413,6 +451,7 @@ export default {
         },
       });
       baseEarth.run();
+      baseEarth.startEntranceAnimation();
       window.addEventListener("resize", resize);
     });
     onBeforeUnmount(() => {

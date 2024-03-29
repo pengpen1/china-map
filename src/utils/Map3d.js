@@ -2,6 +2,7 @@ import * as THREE from "three";
 import { OrbitControls } from "three/examples/jsm/controls/OrbitControls";
 import Stats from "three/examples/jsm/libs/stats.module";
 import TWEEN from "@tweenjs/tween.js";
+import gsap from "gsap";
 import { deepMerge, isType } from "@/utils";
 
 export default class Map3d {
@@ -81,6 +82,25 @@ export default class Map3d {
     // this.camera.position.set(-102, 205, -342)
 
     this.camera.lookAt(0, 0, 0);
+  }
+  // 使用 GSAP 控制相机位置变化
+  startEntranceAnimation() {
+    gsap.to(this.camera.position, {
+      x: 30, // 相机目标 x 坐标
+      y: -30, // 相机目标 y 坐标
+      z: 10, // 相机目标 z 坐标
+      duration: 2, // 动画持续时间
+      ease: "power2.inOut", // 缓动函数
+    });
+
+    // // 使用 GSAP 控制地图的显隐过渡
+    // gsap.to(this.mapGroup.children, {
+    //   opacity: 1, // 目标透明度
+    //   duration: 2, // 动画持续时间
+    //   delay: 0.5, // 延迟一定时间后开始动画
+    //   stagger: 0.1, // 每个元素动画之间的延迟时间
+    //   ease: "power2.inOut", // 缓动函数
+    // });
   }
   /**
    * 初始化渲染器

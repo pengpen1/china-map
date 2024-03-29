@@ -37,7 +37,6 @@ export default function useSequenceFrameAnimate() {
     let c = 0; // 当前列
     let t = 0; // 时间
     mesh.updateSequenceFrame = (time) => {
-      console.log(time);
       t += options.speed;
       if (t > options.frame) t = 0;
       c = options.column - Math.floor(t % options.column) - 1;

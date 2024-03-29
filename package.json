@@ -12,6 +12,7 @@
     "core-js": "^3.6.5",
     "delaunator": "^5.0.0",
     "geo-point-in-polygon": "^1.0.0",
+    "gsap": "^3.12.5",
     "lodash": "^4.17.21",
     "lodash.max": "^4.0.1",
     "normalize.css": "^8.0.1",
