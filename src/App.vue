@@ -19,6 +19,78 @@ import useSequenceFrameAnimate from "@/hooks/useSequenceFrameAnimate";
 import useCSS2DRender from "@/hooks/useCSS2DRender";
 
 let centerXY = [104.114129, 7.550339];
+const ADCODE = [
+  { adcode: "110000", name: "北京市" },
+  { adcode: "120000", name: "天津市" },
+  { adcode: "130000", name: "河北省" },
+  { adcode: "140000", name: "山西省" },
+  { adcode: "150000", name: "内蒙古自治区" },
+  { adcode: "210000", name: "辽宁省" },
+  { adcode: "220000", name: "吉林省" },
+  { adcode: "230000", name: "黑龙江省" },
+  { adcode: "310000", name: "上海市" },
+  { adcode: "320000", name: "江苏省" },
+  { adcode: "330000", name: "浙江省" },
+  { adcode: "340000", name: "安徽省" },
+  { adcode: "350000", name: "福建省" },
+  { adcode: "360000", name: "江西省" },
+  { adcode: "370000", name: "山东省" },
+  { adcode: "410000", name: "河南省" },
+  { adcode: "420000", name: "湖北省" },
+  { adcode: "430000", name: "湖南省" },
+  { adcode: "440000", name: "广东省" },
+  { adcode: "450000", name: "广西壮族自治区" },
+  { adcode: "460000", name: "海南省" },
+  { adcode: "500000", name: "重庆市" },
+  { adcode: "510000", name: "四川省" },
+  { adcode: "520000", name: "贵州省" },
+  { adcode: "530000", name: "云南省" },
+  { adcode: "540000", name: "西藏自治区" },
+  { adcode: "610000", name: "陕西省" },
+  { adcode: "620000", name: "甘肃省" },
+  { adcode: "630000", name: "青海省" },
+  { adcode: "640000", name: "宁夏回族自治区" },
+  { adcode: "650000", name: "新疆维吾尔自治区" },
+  { adcode: "710000", name: "台湾省" },
+  { adcode: "810000", name: "香港特别行政区" },
+  { adcode: "820000", name: "澳门特别行政区" },
+];
+const adCodeMap = {
+  北京市: 110000,
+  天津市: 120000,
+  河北省: 130000,
+  山西省: 140000,
+  内蒙古自治区: 150000,
+  辽宁省: 210000,
+  吉林省: 220000,
+  黑龙江省: 230000,
+  上海市: 310000,
+  江苏省: 320000,
+  浙江省: 330000,
+  安徽省: 340000,
+  福建省: 350000,
+  江西省: 360000,
+  山东省: 370000,
+  河南省: 410000,
+  湖北省: 420000,
+  湖南省: 430000,
+  广东省: 440000,
+  广西壮族自治区: 450000,
+  海南省: 460000,
+  重庆市: 500000,
+  四川省: 510000,
+  贵州省: 520000,
+  云南省: 530000,
+  西藏自治区: 540000,
+  陕西省: 610000,
+  甘肃省: 620000,
+  青海省: 630000,
+  宁夏回族自治区: 640000,
+  新疆维吾尔自治区: 650000,
+  台湾省: 710000,
+  香港特别行政区: 810000,
+  澳门特别行政区: 820000,
+};
 
 export default {
   name: "3dMap30",
@@ -35,8 +107,8 @@ export default {
     const { getBoundingBox } = useCoord();
     const { createCountryFlatLine } = useCountry();
     const { initCSS2DRender, create2DTag } = useCSS2DRender();
-    const { createLightPillar } = useMapMarkedLightPillar({
-      scaleFactor: 1.2,
+    const { createLightPillar, setLightPillarColor } = useMapMarkedLightPillar({
+      scaleFactor: 3,
     });
     // 序列帧
     const { createSequenceFrame } = useSequenceFrameAnimate();
@@ -59,6 +131,26 @@ export default {
     texturefxMap.repeat.set(scale, scale);
 
     const color = new THREE.Color("#29445d");
+    // json数据中的code映射组
+    let groupCodeMap = {};
+    // 光标也可以针对单个省
+    let lightGroup = null;
+    const guiParams = {
+      topColor: "#29445d",
+      sideColor: "#ffffff",
+      // scale: 0.0,
+      markColor: 0xe10909,
+      showBackground: true,
+      adcodeMap: 510000,
+    };
+    let backgroundMesh = null;
+    // 地图拉伸设置
+    const extrudeSettings = {
+      depth: 1,
+      bevelEnabled: true,
+      bevelSegments: 1,
+      bevelThickness: 0.1,
+    };
 
     const topFaceMaterial = new THREE.MeshPhongMaterial({
       // 贴图或者纯色
@@ -77,21 +169,28 @@ export default {
     // 初始化gui
     const initGui = () => {
       const gui = new GUI();
-      const guiParams = {
-        topColor: "#29445d",
-        sideColor: "#ffffff",
-        // scale: 0.0,
-      };
       gui.addColor(guiParams, "topColor").onChange((val) => {
         topFaceMaterial.color = new THREE.Color(val);
       });
       gui.addColor(guiParams, "sideColor").onChange((val) => {
         sideMaterial.color = new THREE.Color(val);
       });
+      gui.addColor(guiParams, "markColor").onChange((val) => {
+        console.log(val);
+        // setLightPillarColor(lightGroup, val);
+      });
       // gui.add(guiParams, "scale", 0, 1).onChange((val) => {
       //   textureMap.repeat.set(val, val);
       //   texturefxMap.repeat.set(val, val);
       // });
+      gui.add(guiParams, "showBackground").onChange((val) => {
+        backgroundMesh.visible = val;
+      });
+      gui.add(guiParams, "adcodeMap", adCodeMap).onChange((val) => {
+        console.log(val); // 15000
+        console.log(groupCodeMap);
+        setLightPillarColor(groupCodeMap[val], guiParams.markColor);
+      });
     };
     // 初始化旋转光圈
     const initRotatingAperture = (scene, width) => {
@@ -135,9 +234,9 @@ export default {
         depthTest: true,
       });
 
-      let mesh = new THREE.Mesh(plane, material);
-      mesh.position.set(...centerXY, bottomZ - 0.2);
-      scene.add(mesh);
+      backgroundMesh = new THREE.Mesh(plane, material);
+      backgroundMesh.position.set(...centerXY, bottomZ - 0.2);
+      scene.add(backgroundMesh);
       scene.fog = new THREE.Fog(0xffffff, 2, 90);
     };
     // 初始化原点
@@ -225,11 +324,12 @@ export default {
         return false;
       }
       // 创建光柱
-      let heightScaleFactor = 1 + random(1, 5) / 5;
+      let heightScaleFactor = 8 + random(1, 5) / 5;
       let lightCenter = properties.centroid || properties.center;
-      let light = createLightPillar(...lightCenter, heightScaleFactor);
-      light.position.z = 0.31;
-      mapGroup.add(light);
+      lightGroup = createLightPillar(...lightCenter, heightScaleFactor);
+      lightGroup.position.z = extrudeSettings.depth + 0.1;
+      mapGroup.add(lightGroup);
+      return lightGroup;
     };
     // 创建标签
     const initLabel = (properties, scene) => {
@@ -279,7 +379,7 @@ export default {
             y: 21.36, // 相机目标 y 坐标
             z: 52.69, // 相机目标 z 坐标
             delay: 0.3, // 延迟一定时间后开始动画
-            duration: 1, // 动画持续时间
+            duration: 2, // 动画持续时间
             ease: "power2.inOut", // 缓动函数
             onUpdate: () => {
               this.camera.lookAt(targetPosition);
@@ -288,7 +388,7 @@ export default {
 
           gsap.to(this.scene.fog, {
             far: 1000,
-            duration: 1,
+            duration: 2,
             delay: 0.3,
             ease: "power2.inOut", // 缓动函数
           });
@@ -299,7 +399,7 @@ export default {
             // 创建组
             this.mapGroup = new THREE.Group();
             // 标签 初始化
-            // this.css2dRender = initCSS2DRender(this.options, this.container);
+            this.css2dRender = initCSS2DRender(this.options, this.container);
 
             provinceData.features.forEach((elem) => {
               // 定一个省份对象
@@ -321,13 +421,6 @@ export default {
                     }
                     shape.lineTo(x, y);
                   }
-                  // 拉伸设置
-                  const extrudeSettings = {
-                    depth: 1,
-                    bevelEnabled: true,
-                    bevelSegments: 1,
-                    bevelThickness: 0.1,
-                  };
                   const geometry = new THREE.ExtrudeGeometry(
                     shape,
                     extrudeSettings
@@ -343,8 +436,12 @@ export default {
               // 将每个省份的地图对象添加到总的地图组 mapGroup 中
               this.mapGroup.add(province);
               // 创建标点和标签
-              initLightPoint(properties, this.mapGroup);
-              // initLabel(properties, this.scene);
+              const curGroup = initLightPoint(properties, this.mapGroup);
+              initLabel(properties, this.scene);
+              // console.log("elem", elem); {type: 'Feature', properties: {name:"北京市",adcode:11000,level: "province",center: [116.405285, 39.904989]}, geometry: {…}
+              if (elem.properties && elem.properties.level === "province") {
+                groupCodeMap[elem.properties.adcode] = curGroup;
+              }
             });
             // 创建上下边框
             initBorderLine(provinceData, this.mapGroup);
@@ -359,10 +456,29 @@ export default {
             initCirclePoint(this.scene, width);
             initSceneBg(this.scene, 40);
 
+            // // 创建发光材质
+            // const glowMaterial = new THREE.MeshBasicMaterial({
+            //   color: 0xffffff, // 设置颜色为白色
+            //   emissive: 0xffffff, // 设置发光颜色为白色
+            //   transparent: true, // 启用透明
+            //   opacity: 0.5, // 设置透明度
+            //   side: THREE.BackSide, // 设置材质的显示面为背面
+            // });
+
+            // // 创建发光的对象
+            // const glowGeometry = new THREE.TorusGeometry(10, 0.5, 16, 100); // 自定义形状，这里使用了环形
+            // const glowMesh = new THREE.Mesh(glowGeometry, glowMaterial);
+            // glowMesh.position.set(...centerXY, 1);
+            // this.scene.add(glowMesh);
+
             // 将组添加到场景中
             this.scene.add(this.mapGroup);
             this.particleArr = initParticle(this.scene, earthGroupBound);
             initGui();
+            setLightPillarColor(
+              groupCodeMap[guiParams.adcodeMap],
+              guiParams.markColor
+            );
           } catch (error) {
             console.log(error);
           }
@@ -398,8 +514,8 @@ export default {
           });
           // 这里是你自己业务上需要的code
           // 在每一帧渲染之后获取相机的实时位置
-          var cameraPosition = this.camera.position.clone();
-          console.log("Camera Position:", cameraPosition);
+          // var cameraPosition = this.camera.position.clone();
+          // console.log("Camera Position:", cameraPosition);
           this.renderer.render(this.scene, this.camera);
           // 控制相机旋转缩放的更新
           if (this.options.controls.visibel && this.controls) {
