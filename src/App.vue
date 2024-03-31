@@ -324,7 +324,7 @@ export default {
         return false;
       }
       // 创建光柱
-      let heightScaleFactor = 8 + random(1, 5) / 5;
+      let heightScaleFactor = 4 + random(1, 5) / 5;
       let lightCenter = properties.centroid || properties.center;
       lightGroup = createLightPillar(...lightCenter, heightScaleFactor);
       lightGroup.position.z = extrudeSettings.depth + 0.1;
@@ -344,9 +344,11 @@ export default {
     };
 
     onMounted(async () => {
-      // 四川数据
+      // 中国地图数据
       let provinceData = await requestData("./data/map/中华人民共和国.json");
+      console.log("原始地图数据", provinceData);
       provinceData = transfromGeoJSON(provinceData);
+      console.log("MultiPolygon", provinceData);
 
       class CurrentMap3d extends Map3d {
         constructor(props) {
@@ -364,13 +366,13 @@ export default {
         }
         // 使用 GSAP 控制相机位置变化
         startEntranceAnimation() {
-          gsap.to(this.mapGroup.children, {
-            opacity: 1, // 目标透明度
-            duration: 2, // 动画持续时间
-            delay: 5, // 延迟一定时间后开始动画
-            // stagger: 0.1, // 每个元素动画之间的延迟时间
-            ease: "power2.inOut", // 缓动函数
-          });
+          // gsap.to(this.mapGroup.children, {
+          //   opacity: 1, // 目标透明度
+          //   duration: 2, // 动画持续时间
+          //   delay: 5, // 延迟一定时间后开始动画
+          //   // stagger: 0.1, // 每个元素动画之间的延迟时间
+          //   ease: "power2.inOut", // 缓动函数
+          // });
 
           const targetPosition = new THREE.Vector3(...centerXY, 0);
           // 使用 GSAP 控制相机位置变化
@@ -429,7 +431,7 @@ export default {
                     topFaceMaterial,
                     sideMaterial,
                   ]);
-                  mesh.material.opacity = 0; // 初始透明度为 0
+                  // mesh.material.opacity = 0; // 初始透明度为 0，无效
                   province.add(mesh);
                 });
               });
@@ -473,7 +475,7 @@ export default {
 
             // 将组添加到场景中
             this.scene.add(this.mapGroup);
-            this.particleArr = initParticle(this.scene, earthGroupBound);
+            // this.particleArr = initParticle(this.scene, earthGroupBound);
             initGui();
             setLightPillarColor(
               groupCodeMap[guiParams.adcodeMap],

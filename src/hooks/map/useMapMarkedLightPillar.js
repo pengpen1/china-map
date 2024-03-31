@@ -98,6 +98,26 @@ export default function useMarkedLightPillar(options) {
     return mesh;
   };
   /**
+   * 复制光柱并旋转
+   * @param {*} object 源光柱
+   * @param {*} count  光柱总数量，包含复制光柱以及源光柱
+   * @returns [...]
+   */
+  const createCopiesWithRotation = (object, count) => {
+    let copies = [];
+    copies.push(object); // 将原始对象放入数组
+
+    for (let i = 1; i < count; i++) {
+      let copy = object.clone(); // 克隆对象
+      copy.name = "createLightPillar" + (i + 1);
+      let rotationAngle = (Math.PI * i) / count; // 计算旋转角度
+      copy.rotateZ(rotationAngle); // 旋转复制体
+      copies.push(copy); // 将复制体放入数组
+    }
+
+    return copies;
+  };
+  /**
    * 创建光柱
    * @param {*} lon
    * @param {*} lat
@@ -124,18 +144,19 @@ export default function useMarkedLightPillar(options) {
     });
     // 光柱01
     let light01 = new THREE.Mesh(geometry, material);
+    // light01.frustumCulled = false;
     light01.name = "createLightPillar01";
-    // 光柱02：复制光柱01
-    let light02 = light01.clone();
-    light02.name = "createLightPillar02";
-    // 光柱02，旋转90°，跟 光柱01交叉
-    light02.rotateZ(Math.PI / 2);
+    // // 光柱02：复制光柱01
+    // let light02 = light01.clone();
+    // light02.name = "createLightPillar02";
+    // // 光柱02，旋转90°，跟 光柱01交叉
+    // light02.rotateZ(Math.PI / 2);
     // 创建底部标点
     const bottomMesh = createPointMesh();
     // 创建光圈
     const lightHalo = createLightHalo();
     // 将光柱和标点添加到组里
-    group.add(bottomMesh, lightHalo, light01, light02);
+    group.add(bottomMesh, lightHalo, ...createCopiesWithRotation(light01, 2));
     // 设置组对象的姿态
     // group = setMeshQuaternion(group, R, lon, lat)
     group.position.set(lon, lat, 0);

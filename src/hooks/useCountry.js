@@ -28,7 +28,7 @@ const useCountryLine = () => {
     for (let i = 0; i < features.length; i++) {
       const element = features[i];
       element.geometry.coordinates.forEach((coords, idx) => {
-        console.log(idx);
+        // console.log(idx);
         // 每一块的点数据
         const points = [];
         if (lineType === "Line2") {

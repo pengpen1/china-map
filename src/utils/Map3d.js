@@ -116,6 +116,7 @@ export default class Map3d {
     renderer.setSize(width, height);
     // 设置背景色
     renderer.setClearColor(bgColor, 1);
+    // renderer.sortObjects = false;
     // 插入到dom中
     this.container.appendChild(renderer.domElement);
     this.renderer = renderer;
@@ -157,6 +158,7 @@ export default class Map3d {
   }
   initAxes() {
     if (!this.options.axesVisibel) return false;
+    // 辅助观察坐标系
     var axes = new THREE.AxesHelper(this.options.axesHelperSize);
     this.addObject(axes);
   }
