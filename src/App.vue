@@ -1,7 +1,7 @@
 <template>
   <div class="index_home">
     <!-- 顶部 -->
-    <div class="navigation">
+    <div class="navigation" v-if="showCharts">
       <div class="navigation_ul">
         <div class="navigation_ul_menu navigation_ul_menu_left">
           <div
@@ -26,7 +26,7 @@
         </div>
 
         <div class="navigation_main">
-          <div class="navigation_name">整体视图</div>
+          <div class="navigation_name">集中运营平台</div>
         </div>
 
         <div class="navigation_ul_menu navigation_ul_menu_right">
@@ -75,7 +75,14 @@
       </div>
     </div>
     <!-- 左侧图表 -->
+    <div class="index_left" v-if="showCharts">
+      <!-- 左边 统计图 -->
+      <leftBuiding></leftBuiding>
+    </div>
     <!-- 右侧图表 -->
+    <div class="index_right" v-if="showCharts">
+      <rightBuiding></rightBuiding>
+    </div>
     <!-- 地图 -->
     <div class="contengt-wrap">
       <div id="app-32-map" class="is-full"></div>
@@ -90,7 +97,7 @@ import TWEEN from "@tweenjs/tween.js";
 import gsap from "gsap";
 import * as THREE from "three";
 import { GUI } from "three/examples/jsm/libs/lil-gui.module.min.js";
-import { onBeforeUnmount, onMounted, reactive } from "vue";
+import { onBeforeUnmount, onMounted, reactive, ref } from "vue";
 import { random } from "@/utils";
 import useFileLoader from "@/hooks/useFileLoader.js";
 import useCountry from "@/hooks/useCountry.js";
@@ -99,6 +106,9 @@ import useConversionStandardData from "@/hooks/useConversionStandardData.js";
 import useMapMarkedLightPillar from "@/hooks/map/useMapMarkedLightPillar";
 import useSequenceFrameAnimate from "@/hooks/useSequenceFrameAnimate";
 import useCSS2DRender from "@/hooks/useCSS2DRender";
+
+import leftBuiding from "./components/left/leftBuiding.vue";
+import rightBuiding from "./components/right/rightBuiding.vue";
 
 let centerXY = [104.114129, 7.550339];
 const ADCODE = [
@@ -176,6 +186,10 @@ const adCodeMap = {
 
 export default {
   name: "3dMap30",
+  components: {
+    leftBuiding,
+    rightBuiding,
+  },
   setup() {
     // 地图相关逻辑
     let baseEarth = null;
@@ -225,6 +239,7 @@ export default {
       markColor: 0xe10909,
       showBackground: true,
       adcodeMap: 510000,
+      showCharts: true,
     };
     let backgroundMesh = null;
     // 地图拉伸设置
@@ -266,13 +281,16 @@ export default {
       //   textureMap.repeat.set(val, val);
       //   texturefxMap.repeat.set(val, val);
       // });
-      gui.add(guiParams, "showBackground").onChange((val) => {
-        backgroundMesh.visible = val;
-      });
       gui.add(guiParams, "adcodeMap", adCodeMap).onChange((val) => {
         console.log(val); // 15000
         console.log(groupCodeMap);
         setLightPillarColor(groupCodeMap[val], guiParams.markColor);
+      });
+      gui.add(guiParams, "showBackground").onChange((val) => {
+        backgroundMesh.visible = val;
+      });
+      gui.add(guiParams, "showCharts").onChange((val) => {
+        showCharts.value = val;
       });
     };
     // 初始化旋转光圈
@@ -519,6 +537,7 @@ export default {
     onMounted(async () => {
       // 图表相关
       currentTime();
+      animation();
 
       // 中国地图数据
       let provinceData = await requestData("./data/map/中华人民共和国.json");
@@ -783,7 +802,7 @@ export default {
           id: 3,
         },
         {
-          name: "运维监控",
+          name: "分支节点",
           route: "/command", //路由
           active: false,
           id: 4,
@@ -825,6 +844,7 @@ export default {
     };
     // 动画效果
     const animation = () => {
+      let navigation = document.querySelector(".navigation"); // 导航
       let imgsSetting = document.querySelector(".imgs_setting"); // 边框
       let navigationMain = document.querySelector(".navigation_main"); // 文字
       let navigationUlMenuLeft = document.querySelector(
@@ -833,18 +853,22 @@ export default {
       let navigationUlMenuRight = document.querySelector(
         ".navigation_ul_menu_right"
       ); // 右
-      imgsSetting.style.cssText = "animation: imgsSettingTop 1s; opacity: 1;";
-      navigationMain.style.cssText =
-        "animation: imgsSettingTop 2s; opacity: 1;";
-      navigationUlMenuLeft.style.cssText =
-        "animation: navigationBottom 3s; opacity: 1;";
-      navigationUlMenuRight.style.cssText =
-        "animation: navigationBottom 3s; opacity: 1;";
 
-      this.$refs.userName.style.cssText =
-        "animation: imgsSettingTop 3s; opacity: 1;"; // 用户名称
-      this.$refs.timeDate.style.cssText =
-        "animation: navigationBottom 3s; opacity: 1;"; // 时间日期
+      navigation.style.cssText =
+        "animation: imgsSettingTop 1s 0.8s; opacity: 1;";
+      imgsSetting.style.cssText =
+        "animation: imgsSettingTop 1s 1s; opacity: 1;";
+      navigationMain.style.cssText =
+        "animation: imgsSettingTop 2s 1s; opacity: 1;";
+      navigationUlMenuLeft.style.cssText =
+        "animation: navigationBottom 3s 1s; opacity: 1;";
+      navigationUlMenuRight.style.cssText =
+        "animation: navigationBottom 3s 1s; opacity: 1;";
+
+      userName.value.style.cssText =
+        "animation: imgsSettingTop 3s 1s; opacity: 1;"; // 用户名称
+      timeDate.value.style.cssText =
+        "animation: navigationBottom 3s 1s; opacity: 1;"; // 时间日期
     };
 
     const handleClick = (item) => {
@@ -856,9 +880,16 @@ export default {
       }
     };
 
+    const timeDate = ref(null);
+    const userName = ref(null);
+    const showCharts = ref(true);
+
     return {
       displayData,
       handleClick,
+      timeDate,
+      userName,
+      showCharts,
     };
   },
 };
@@ -1097,5 +1128,49 @@ body,
   to {
     bottom: 0;
   }
+}
+
+.index_home .index_left {
+  position: fixed;
+  z-index: 3;
+  opacity: 1;
+  left: 0;
+  top: 0;
+  width: 20%;
+  height: 100%;
+}
+.index_home .index_right {
+  position: fixed;
+  z-index: 2;
+  opacity: 1;
+  right: 0;
+  top: 0;
+  width: 20%;
+  height: 100%;
+}
+
+.index_home .floor_right {
+  position: fixed;
+  z-index: 2;
+  opacity: 1;
+  right: 20%;
+  width: 4%;
+  height: 100%;
+  /* background-color: #fff; */
+
+  bottom: 0;
+}
+.index_home .operation_left {
+  position: fixed;
+  z-index: 2;
+  opacity: 1;
+  left: 20%;
+  width: 98px;
+  height: 50%;
+  /* background-color: #fff; */
+  bottom: 0;
+  top: 0;
+  margin: auto 0;
+  overflow: hidden;
 }
 </style>
