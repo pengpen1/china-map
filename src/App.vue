@@ -1,14 +1,96 @@
 <template>
-  <div id="app-32-map" class="is-full"></div>
+  <div class="index_home">
+    <!-- 顶部 -->
+    <div class="navigation">
+      <div class="navigation_ul">
+        <div class="navigation_ul_menu navigation_ul_menu_left">
+          <div
+            class="navigation_li"
+            v-for="item in displayData.menuData1"
+            @click="handleClick(item)"
+            :class="item.active ? 'navigation_li_te' : ''"
+            :key="item.id"
+          >
+            <span
+              style="
+                color: #fff;
+                height: 100%;
+                width: 100%;
+                display: block;
+                text-decoration: none;
+              "
+            >
+              {{ item.name }}</span
+            >
+          </div>
+        </div>
+
+        <div class="navigation_main">
+          <div class="navigation_name">整体视图</div>
+        </div>
+
+        <div class="navigation_ul_menu navigation_ul_menu_right">
+          <div
+            class="navigation_li navigation_li_Right"
+            v-for="item in displayData.menuData2"
+            @click="handleClick(item)"
+            :class="item.active ? 'navigation_li_Right_te' : ''"
+            :key="item.id"
+          >
+            <span
+              style="
+                color: #fff;
+                height: 100%;
+                width: 100%;
+                display: block;
+                text-decoration: none;
+              "
+            >
+              {{ item.name }}</span
+            >
+          </div>
+        </div>
+        <div class="imgs_setting"></div>
+      </div>
+      <div class="navigation_left"></div>
+      <div class="navigation_right">
+        <div class="navigation_tips_name" ref="userName">
+          <!-- 铃声 -->
+          <div class="navigation_tips">
+            <!-- <span>1</span> -->
+          </div>
+          <div class="navigation_name">root</div>
+        </div>
+        <div class="date" ref="timeDate">
+          <div class="date_text">
+            {{ displayData.nowDate }}
+          </div>
+          <!-- <div class="date_text">
+						10:00
+					</div> -->
+          <!-- <div class="date_text">
+						农历九月初六
+					</div> -->
+        </div>
+      </div>
+    </div>
+    <!-- 左侧图表 -->
+    <!-- 右侧图表 -->
+    <!-- 地图 -->
+    <div class="contengt-wrap">
+      <div id="app-32-map" class="is-full"></div>
+    </div>
+  </div>
 </template>
 
 <script>
 import Map3d from "@/utils/Map3d.js";
+import * as d3 from "d3";
 import TWEEN from "@tweenjs/tween.js";
 import gsap from "gsap";
 import * as THREE from "three";
 import { GUI } from "three/examples/jsm/libs/lil-gui.module.min.js";
-import { onBeforeUnmount, onMounted } from "vue";
+import { onBeforeUnmount, onMounted, reactive } from "vue";
 import { random } from "@/utils";
 import useFileLoader from "@/hooks/useFileLoader.js";
 import useCountry from "@/hooks/useCountry.js";
@@ -95,6 +177,7 @@ const adCodeMap = {
 export default {
   name: "3dMap30",
   setup() {
+    // 地图相关逻辑
     let baseEarth = null;
 
     // 重置
@@ -239,6 +322,94 @@ export default {
       scene.add(backgroundMesh);
       scene.fog = new THREE.Fog(0xffffff, 2, 90);
     };
+
+    // 初始化中国轮廓地图
+    const ChinaOutlineParams = {
+      lines: [],
+      positions: null,
+      opacitys: null,
+      points: null,
+      geometry: null,
+      currentPos: 0,
+      pointSpeed: 20,
+    };
+    const initChinaOutline = async (scene) => {
+      ChinaOutlineParams.geometry = new THREE.BufferGeometry();
+      // 以北京为中心 修改坐标
+      const projection = d3
+        .geoMercator()
+        .center([116.412318, 39.909843])
+        .translate([0, 0]);
+
+      let indexBol = true;
+
+      /**
+       * 边框 图形绘制
+       * @param polygon 多边形 点数组
+       * @param color 材质颜色
+       * */
+      function lineDraw(polygon, color) {
+        const lineGeometry = new THREE.BufferGeometry();
+        const pointsArray = new Array();
+        polygon.forEach((row) => {
+          const [x, y] = projection(row);
+          // 创建三维点
+          pointsArray.push(new THREE.Vector3(x, -y, 0));
+          console.log(indexBol);
+          if (indexBol) {
+            ChinaOutlineParams.lines.push([x, -y, 0]);
+          }
+        });
+        indexBol = false;
+        // 放入多个点
+        lineGeometry.setFromPoints(pointsArray);
+
+        const lineMaterial = new THREE.LineBasicMaterial({
+          color: color,
+        });
+        return new THREE.Line(lineGeometry, lineMaterial);
+      }
+
+      const chinaData = await requestData("./data/map/中国轮廓.json");
+      console.log("中国轮廓数据", chinaData);
+
+      // 中国边界
+      const feature = chinaData.features[0];
+      const province = new THREE.Object3D();
+      province.properties = feature.properties.name;
+      // 点数据
+      const coordinates = feature.geometry.coordinates;
+
+      coordinates.forEach((coordinate) => {
+        // coordinate 多边形数据
+        coordinate.forEach((rows) => {
+          const line = lineDraw(rows, 0xffffff);
+          province.add(line);
+        });
+      });
+
+      ChinaOutlineParams.positions = new Float32Array(
+        ChinaOutlineParams.lines.flat(1)
+      );
+      // 设置顶点
+      ChinaOutlineParams.geometry.setAttribute(
+        "position",
+        new THREE.BufferAttribute(114, 38, 0)
+      );
+      console.log(ChinaOutlineParams);
+      // 设置 粒子透明度为 0
+      ChinaOutlineParams.opacitys = new Float32Array(
+        ChinaOutlineParams.positions.length
+      ).map(() => 0);
+      ChinaOutlineParams.geometry.setAttribute(
+        "aOpacity",
+        new THREE.BufferAttribute(ChinaOutlineParams.opacitys, 1)
+      );
+
+      province.position.set(114, 38, 0);
+      province.scale.set(0.35, 0.35, 0.35);
+      scene.add(province);
+    };
     // 初始化原点
     const initCirclePoint = (scene, width) => {
       let plane = new THREE.PlaneBufferGeometry(width, width);
@@ -295,13 +466,15 @@ export default {
       let lineTop = createCountryFlatLine(
         data,
         {
-          color: 0xffffff,
-          linewidth: 0.0015,
+          // color: 0xffffff,
+          color: 0xa9a7a7,
+          linewidth: 0.001,
           transparent: true,
           depthTest: false,
         },
         "Line2"
       );
+      // lineTop.position.z = extrudeSettings.depth;
       lineTop.position.z += 0.305;
       let lineBottom = createCountryFlatLine(
         data,
@@ -344,11 +517,14 @@ export default {
     };
 
     onMounted(async () => {
+      // 图表相关
+      currentTime();
+
       // 中国地图数据
       let provinceData = await requestData("./data/map/中华人民共和国.json");
+      // let provinceData = await requestData("./data/map/中国所有省.json");
       console.log("原始地图数据", provinceData);
       provinceData = transfromGeoJSON(provinceData);
-      console.log("MultiPolygon", provinceData);
 
       class CurrentMap3d extends Map3d {
         constructor(props) {
@@ -447,6 +623,7 @@ export default {
             });
             // 创建上下边框
             initBorderLine(provinceData, this.mapGroup);
+            console.log("this.mapGroup", this.mapGroup);
 
             let earthGroupBound = getBoundingBox(this.mapGroup);
             centerXY = [earthGroupBound.center.x, earthGroupBound.center.y + 8];
@@ -457,6 +634,8 @@ export default {
             // this.rotatingPointMesh = initRotatingPoint(this.scene, width - 2);
             initCirclePoint(this.scene, width);
             initSceneBg(this.scene, 40);
+            // initChinaOutline(this.scene);
+            console.log(ChinaOutlineParams);
 
             // // 创建发光材质
             // const glowMaterial = new THREE.MeshBasicMaterial({
@@ -515,9 +694,11 @@ export default {
             this.loop();
           });
           // 这里是你自己业务上需要的code
+
           // 在每一帧渲染之后获取相机的实时位置
           // var cameraPosition = this.camera.position.clone();
           // console.log("Camera Position:", cameraPosition);
+
           this.renderer.render(this.scene, this.camera);
           // 控制相机旋转缩放的更新
           if (this.options.controls.visibel && this.controls) {
@@ -575,6 +756,110 @@ export default {
     onBeforeUnmount(() => {
       window.removeEventListener("resize", resize);
     });
+
+    // 图表相关逻辑
+    const displayData = reactive({
+      // 左 菜单
+      menuData1: [
+        {
+          name: "整体视图",
+          active: true,
+          route: "/landmark", //路由
+          id: 0,
+        },
+        {
+          name: "资产视图",
+          active: false,
+          route: "/building", //路由
+          id: 2,
+        },
+      ],
+      // 右 菜单
+      menuData2: [
+        {
+          name: "风险视图",
+          active: false,
+          route: "/operation", //路由
+          id: 3,
+        },
+        {
+          name: "运维监控",
+          route: "/command", //路由
+          active: false,
+          id: 4,
+        },
+      ],
+
+      // 当前日期和时间
+      nowDate: "", // 当前日期
+      openType: false,
+    });
+
+    // 日期 时间 星期
+    const formatDate = () => {
+      let date = new Date();
+      let year = date.getFullYear(); // 年
+      let month = date.getMonth() + 1; // 月
+      let day = date.getDate(); // 日
+      let week = date.getDay(); // 星期
+      let weekArr = [
+        "星期日",
+        "星期一",
+        "星期二",
+        "星期三",
+        "星期四",
+        "星期五",
+        "星期六",
+      ];
+      let hour = date.getHours(); // 时
+      hour = hour < 10 ? "0" + hour : hour; // 如果只有一位，则前面补零
+      let minute = date.getMinutes(); // 分
+      minute = minute < 10 ? "0" + minute : minute; // 如果只有一位，则前面补零
+      let second = date.getSeconds(); // 秒
+      second = second < 10 ? "0" + second : second; // 如果只有一位，则前面补零
+      displayData.nowDate = `${year}/${month}/${day} ${hour}:${minute}:${second} ${weekArr[week]}`;
+    };
+    // 日期 时间 星期  刷新
+    const currentTime = () => {
+      setInterval(formatDate, 500); // 每 0.5秒 刷新 获取时间 数据
+    };
+    // 动画效果
+    const animation = () => {
+      let imgsSetting = document.querySelector(".imgs_setting"); // 边框
+      let navigationMain = document.querySelector(".navigation_main"); // 文字
+      let navigationUlMenuLeft = document.querySelector(
+        ".navigation_ul_menu_left"
+      ); // 左
+      let navigationUlMenuRight = document.querySelector(
+        ".navigation_ul_menu_right"
+      ); // 右
+      imgsSetting.style.cssText = "animation: imgsSettingTop 1s; opacity: 1;";
+      navigationMain.style.cssText =
+        "animation: imgsSettingTop 2s; opacity: 1;";
+      navigationUlMenuLeft.style.cssText =
+        "animation: navigationBottom 3s; opacity: 1;";
+      navigationUlMenuRight.style.cssText =
+        "animation: navigationBottom 3s; opacity: 1;";
+
+      this.$refs.userName.style.cssText =
+        "animation: imgsSettingTop 3s; opacity: 1;"; // 用户名称
+      this.$refs.timeDate.style.cssText =
+        "animation: navigationBottom 3s; opacity: 1;"; // 时间日期
+    };
+
+    const handleClick = (item) => {
+      if (item) {
+        [...displayData.menuData1, ...displayData.menuData2].forEach((item) => {
+          item.active = false;
+        });
+        item.active = true;
+      }
+    };
+
+    return {
+      displayData,
+      handleClick,
+    };
   },
 };
 </script>
@@ -587,8 +872,230 @@ body,
   height: 100%;
   overflow: hidden;
 }
+.index_home,
+.contengt-wrap {
+  width: 100%;
+  height: 100%;
+  position: relative;
+}
+#pp-32-map {
+  position: fixed;
+  z-index: 0;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+  overflow: hidden;
+}
 .map-32-label {
   font-size: 10px;
   color: #fff;
+}
+
+/* 首页+ 导航栏 css */
+.index_home {
+}
+/* 导航栏 */
+.index_home .navigation {
+  position: fixed;
+  z-index: 100;
+  top: 0;
+  left: 0;
+  height: 80px;
+  width: 100%;
+  background-image: url(/imges/building/bei/shang.png);
+  background-size: 100% 100%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  overflow: hidden;
+}
+.navigation .navigation_ul {
+  /* margin-top: .5%; */
+  height: 100%;
+  display: flex;
+  align-items: center;
+  position: relative;
+}
+.navigation .navigation_ul .navigation_ul_menu {
+  position: relative;
+  display: flex;
+}
+
+.navigation .navigation_left {
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: 100%;
+  width: 20%;
+  /* background-image: url(/imges/building/bei/zuo.png); */
+  /* background-size: 100% 100%; */
+}
+.navigation .navigation_right {
+  position: absolute;
+  right: 0;
+  top: 0;
+  height: 100%;
+  width: 20%;
+  /* background-image: url(/imges/building/bei/you.png); */
+  /* background-size: 100% 100%; */
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+.navigation .navigation_right .navigation_tips_name {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: right;
+}
+/* 提示 */
+.navigation .navigation_right .navigation_tips {
+  cursor: pointer;
+  width: 20px;
+  height: 23px;
+  background-image: url(/imges/building/ico/lingSheng.png);
+  background-size: 100% 100%;
+}
+
+.navigation .navigation_right .date {
+  position: relative;
+  margin-top: 5px;
+  display: flex;
+  margin-left: auto;
+  margin-right: 3%;
+  width: 60%;
+  justify-content: right;
+}
+.navigation .navigation_right .date .date_text {
+  margin: 0 5px;
+  font-size: 12px;
+  color: #0798d7;
+}
+
+.navigation_name {
+  cursor: pointer;
+  margin-right: 3%;
+  padding: 0 3%;
+  font-size: 14px;
+  color: #fff;
+}
+.navigation .navigation_ul .navigation_li {
+  /* margin: 0 3px; */
+  position: relative;
+  z-index: 1;
+  width: 120px;
+  height: 34px;
+  line-height: 34px;
+  font-size: 16px;
+  text-align: center;
+  color: #fff;
+  /* background-color: aliceblue; */
+  background: url("/imges/Button.png") no-repeat;
+  background-size: 100% 100%;
+  cursor: pointer;
+}
+.navigation .navigation_ul .navigation_li_Right {
+  background: url("/imges/you_button.png") no-repeat;
+  background-size: 100% 100%;
+}
+.navigation .navigation_ul .navigation_li_te {
+  background: url("/imges/Button2.png") no-repeat;
+  background-size: 100% 100%;
+}
+.navigation .navigation_ul .navigation_li_Right_te {
+  background: url("/imges/you_button2.png") no-repeat;
+  background-size: 100% 100%;
+}
+.navigation .navigation_ul .navigation_li:hover {
+  background: url("/imges/Button2.png") no-repeat;
+  background-size: 100% 100%;
+}
+.navigation .navigation_ul .navigation_li_Right:hover {
+  background: url("/imges/you_button2.png") no-repeat;
+  background-size: 100% 100%;
+}
+.navigation .navigation_ul .navigation_main {
+  position: relative;
+  height: 100%;
+  width: 320px;
+  text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+}
+.navigation .navigation_ul .navigation_name {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 280px;
+  font-size: 20px;
+  height: 95%;
+  padding-bottom: 5%;
+  color: #09b7ff;
+  font-size: 22px;
+  font-weight: 700;
+  /* background-color: rgba(255,255,255,.4); */
+}
+.navigation .navigation_ul .imgs_setting {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 0;
+  margin: auto;
+  width: 75%;
+  height: 55%;
+  background: url("/imges/main_title.png") no-repeat;
+  background-size: 100% 100%;
+}
+
+/* 内容 */
+.index_home .index_content {
+  height: 91%;
+  position: relative;
+}
+.index_content_model {
+  position: fixed;
+  z-index: 0;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
+}
+/* .index_home .index_content .index_left{
+    position: fixed;
+    left: 0;
+    top: 80px;
+    width: 26%;
+    height:  calc(100% - 80px);
+    
+}
+.index_home .index_content .index_right{
+    position: fixed;
+    right: 0;
+    top: 80px;
+    width: 26%;
+    height:  calc(100% - 80px);
+} */
+
+@keyframes imgsSettingTop {
+  from {
+    top: -400px;
+  }
+  to {
+    top: 0;
+  }
+}
+
+@keyframes navigationBottom {
+  from {
+    bottom: -1000px;
+  }
+  to {
+    bottom: 0;
+  }
 }
 </style>

@@ -72,7 +72,7 @@ export default function useMarkedLightPillar(options) {
     let mesh = new THREE.Mesh(geometry, material);
     mesh.name = "createLightHalo";
     // 缩放
-    const scale = 4;
+    const scale = 2.5;
     mesh.scale.set(scale, scale, scale);
     // 动画延迟时间
     const delay = random(0, 2000);
