@@ -157,11 +157,14 @@ export default {
       let effectMonitor = document.querySelector(".effect_monitor");
       let effectVehicle = document.querySelector(".effect_vehicle");
       let effectLighting = document.querySelector(".effect_lighting");
-      effectPolice.style.cssText = "animation: rightBuiding 2s 1s; opacity: 1";
-      effectMonitor.style.cssText = "animation: rightBuiding 3s 1s; opacity: 1";
-      effectVehicle.style.cssText = "animation: rightBuiding 4s 1s; opacity: 1";
+      effectPolice.style.cssText =
+        "animation: rightBuiding 2s 1s forwards; opacity: 0";
+      effectMonitor.style.cssText =
+        "animation: rightBuiding 3s 1s forwards; opacity: 0";
+      effectVehicle.style.cssText =
+        "animation: rightBuiding 4s 1s forwards; opacity: 0";
       effectLighting.style.cssText =
-        "animation: rightBuiding 5s 1s; opacity: 1";
+        "animation: rightBuiding 5s 1s forwards; opacity: 0";
     },
   },
 };

@@ -111,6 +111,7 @@ import leftBuiding from "./components/left/leftBuiding.vue";
 import rightBuiding from "./components/right/rightBuiding.vue";
 
 let centerXY = [104.114129, 7.550339];
+const COLOR_ARR = ["#0465BD", "#357bcb", "#3d658a"];
 const ADCODE = [
   { adcode: "110000", name: "北京市" },
   { adcode: "120000", name: "天津市" },
@@ -240,6 +241,9 @@ export default {
       showBackground: true,
       adcodeMap: 510000,
       showCharts: true,
+      showAperture: true,
+      rotatingApertureMesh: null,
+      rotatingPointMesh: null,
     };
     let backgroundMesh = null;
     // 地图拉伸设置
@@ -291,6 +295,10 @@ export default {
       });
       gui.add(guiParams, "showCharts").onChange((val) => {
         showCharts.value = val;
+      });
+      gui.add(guiParams, "showAperture").onChange((val) => {
+        guiParams.rotatingApertureMesh.visible = val;
+        guiParams.rotatingPointMesh.visible = val;
       });
     };
     // 初始化旋转光圈
@@ -352,7 +360,6 @@ export default {
       pointSpeed: 20,
     };
     const initChinaOutline = async (scene) => {
-      ChinaOutlineParams.geometry = new THREE.BufferGeometry();
       // 以北京为中心 修改坐标
       const projection = d3
         .geoMercator()
@@ -405,24 +412,6 @@ export default {
           province.add(line);
         });
       });
-
-      ChinaOutlineParams.positions = new Float32Array(
-        ChinaOutlineParams.lines.flat(1)
-      );
-      // 设置顶点
-      ChinaOutlineParams.geometry.setAttribute(
-        "position",
-        new THREE.BufferAttribute(114, 38, 0)
-      );
-      console.log(ChinaOutlineParams);
-      // 设置 粒子透明度为 0
-      ChinaOutlineParams.opacitys = new Float32Array(
-        ChinaOutlineParams.positions.length
-      ).map(() => 0);
-      ChinaOutlineParams.geometry.setAttribute(
-        "aOpacity",
-        new THREE.BufferAttribute(ChinaOutlineParams.opacitys, 1)
-      );
 
       province.position.set(114, 38, 0);
       province.scale.set(0.35, 0.35, 0.35);
@@ -531,7 +520,10 @@ export default {
       var label = create2DTag("标签", "map-32-label");
       scene.add(label);
       let labelCenter = properties.center; //centroid || properties.center
-      label.show(properties.name, new THREE.Vector3(...labelCenter, 0.31));
+      label.show(
+        properties.name,
+        new THREE.Vector3(...labelCenter, extrudeSettings.depth + 0.31)
+      );
     };
 
     onMounted(async () => {
@@ -598,7 +590,7 @@ export default {
             // 标签 初始化
             this.css2dRender = initCSS2DRender(this.options, this.container);
 
-            provinceData.features.forEach((elem) => {
+            provinceData.features.forEach((elem, index) => {
               // 定一个省份对象
               const province = new THREE.Object3D();
               // 坐标
@@ -622,10 +614,23 @@ export default {
                     shape,
                     extrudeSettings
                   );
+
+                  const color = COLOR_ARR[index % COLOR_ARR.length];
+                  const topFaceMaterial = new THREE.MeshPhongMaterial({
+                    color,
+                    combine: THREE.MultiplyOperation,
+                    transparent: true,
+                    opacity: 1,
+                  });
                   const mesh = new THREE.Mesh(geometry, [
                     topFaceMaterial,
                     sideMaterial,
                   ]);
+                  if (index % 2 === 0) {
+                    // 凹凸效果
+                    mesh.scale.set(1, 1, 1.2);
+                    //  topFaceMaterial.color = new THREE.Color("#ffffff"); //这样设置所有都被修改了
+                  }
                   // mesh.material.opacity = 0; // 初始透明度为 0，无效
                   province.add(mesh);
                 });
@@ -649,11 +654,13 @@ export default {
             let { size } = earthGroupBound;
             let width = size.x < size.y ? size.y + 1 : size.x + 1;
             // 添加背景，修饰元素
-            // this.rotatingApertureMesh = initRotatingAperture(this.scene, width);
-            // this.rotatingPointMesh = initRotatingPoint(this.scene, width - 2);
+            this.rotatingApertureMesh = guiParams.rotatingApertureMesh =
+              initRotatingAperture(this.scene, width);
+            this.rotatingPointMesh = guiParams.rotatingPointMesh =
+              initRotatingPoint(this.scene, width - 2);
             initCirclePoint(this.scene, width);
             initSceneBg(this.scene, 40);
-            // initChinaOutline(this.scene);
+            initChinaOutline(this.scene);
             console.log(ChinaOutlineParams);
 
             // // 创建发光材质
@@ -726,12 +733,12 @@ export default {
           }
           // 统计更新
           if (this.options.statsVisibel) this.stats.update();
-          // if (this.rotatingApertureMesh) {
-          //   this.rotatingApertureMesh.rotation.z += 0.0005;
-          // }
-          // if (this.rotatingPointMesh) {
-          //   this.rotatingPointMesh.rotation.z -= 0.0005;
-          // }
+          if (guiParams.showAperture && this.rotatingApertureMesh) {
+            this.rotatingApertureMesh.rotation.z += 0.0005;
+          }
+          if (guiParams.showAperture && this.rotatingPointMesh) {
+            this.rotatingPointMesh.rotation.z -= 0.0005;
+          }
           // 渲染标签
           if (this.css2dRender) {
             this.css2dRender.render(this.scene, this.camera);
@@ -802,7 +809,7 @@ export default {
           id: 3,
         },
         {
-          name: "分支节点",
+          name: "暂未开放",
           route: "/command", //路由
           active: false,
           id: 4,
@@ -919,8 +926,13 @@ body,
   overflow: hidden;
 }
 .map-32-label {
-  font-size: 10px;
+  padding: 4px;
   color: #fff;
+  font-size: 12px;
+  text-align: center;
+  background: rgba(0, 0, 0, 0.6);
+  display: flex;
+  flex-direction: row;
 }
 
 /* 首页+ 导航栏 css */
@@ -1102,7 +1114,7 @@ body,
     top: 80px;
     width: 26%;
     height:  calc(100% - 80px);
-    
+
 }
 .index_home .index_content .index_right{
     position: fixed;

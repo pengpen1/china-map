@@ -99,10 +99,14 @@ export default {
       let dynamicEnergy = document.querySelector(".dynamic_energy");
       let dynamicHavc = document.querySelector(".dynamic_havc");
       let dynamicElectric = document.querySelector(".dynamic_electric");
-      dynamicDyke.style.cssText = "animation: leftBuiding 2s 1s; opacity: 1";
-      dynamicEnergy.style.cssText = "animation: leftBuiding 3s 1s; opacity: 1";
-      dynamicHavc.style.cssText = "animation: leftBuiding 4s 1s; opacity: 1";
-      dynamicElectric.style.cssText = "animation: leftBuiding 5s 1s; opacity: 1";
+      dynamicDyke.style.cssText =
+        "animation: leftBuiding 2s 1s forwards; opacity: 0";
+      dynamicEnergy.style.cssText =
+        "animation: leftBuiding 3s 1s forwards; opacity: 0";
+      dynamicHavc.style.cssText =
+        "animation: leftBuiding 4s 1s forwards; opacity: 0";
+      dynamicElectric.style.cssText =
+        "animation: leftBuiding 5s 1s forwards; opacity: 0";
     },
     // 水球图
     sphereChart(quality, value, degree) {

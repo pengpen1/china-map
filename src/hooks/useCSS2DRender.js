@@ -28,19 +28,19 @@ export default function useCSS2DRender() {
    */
   const create2DTag = (name = "", className = "") => {
     let tag = document.createElement("div");
-    tag.innerHTML = name;
+    // tag.innerHTML = name;
     tag.className = className;
     tag.style.pointerEvents = "none";
     tag.style.visibility = "hidden";
     tag.style.position = "absolute";
     // 如果className不存在，用以下样式
     if (!className) {
-      tag.style.padding = "10px";
+      tag.style.padding = "4px";
       tag.style.color = "#fff";
       tag.style.fontSize = "12px";
       tag.style.textAlign = "center";
       tag.style.background = "rgba(0,0,0,0.6)";
-      tag.style.borderRadius = "4px";
+      // tag.style.borderRadius = "4px";
     }
     let label = new CSS2DObject(tag);
     /**
@@ -49,8 +49,20 @@ export default function useCSS2DRender() {
      * @param {*} point 显示坐标
      */
     label.show = (name, point) => {
-      label.element.innerHTML = name;
+      const labelWrap = document.createElement("div");
+      labelWrap.innerHTML = name;
+      labelWrap.style.color = "#fff";
+      labelWrap.style.background = "rgba(198,195,195,0.6)";
+      labelWrap.style.padding = "2px 4px";
+
+      const otherWrap = document.createElement("div");
+      otherWrap.innerHTML = "拼音或者上报情况";
+      otherWrap.style.color = "#fff";
+      otherWrap.style.padding = "2px 4px";
+
+      label.element.append(labelWrap, otherWrap);
       label.element.style.visibility = "visible";
+      label.element.style.display = "flex";
       label.position.copy(point);
     };
     /**
