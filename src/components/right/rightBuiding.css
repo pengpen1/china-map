@@ -277,11 +277,15 @@
 
 @keyframes rightBuiding {
   from {
-    right: -1000px;
+    /* right: -1000px; */
+    transform: translateX(100%);
+    -webkit-transform: translateX(100%);
     opacity: 0;
   }
   to {
-    right: 0;
+    /* right: 0; */
+    transform: translateX(0);
+    -webkit-transform: translateX(0);
     opacity: 1;
   }
 }

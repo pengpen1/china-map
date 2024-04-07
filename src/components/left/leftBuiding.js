@@ -102,11 +102,11 @@ export default {
       dynamicDyke.style.cssText =
         "animation: leftBuiding 2s 1s forwards; opacity: 0";
       dynamicEnergy.style.cssText =
-        "animation: leftBuiding 3s 1s forwards; opacity: 0";
+        "animation: leftBuiding 2.5s 1s forwards; opacity: 0";
       dynamicHavc.style.cssText =
-        "animation: leftBuiding 4s 1s forwards; opacity: 0";
+        "animation: leftBuiding 3s 1s forwards; opacity: 0";
       dynamicElectric.style.cssText =
-        "animation: leftBuiding 5s 1s forwards; opacity: 0";
+        "animation: leftBuiding 3.5s 1s forwards; opacity: 0";
     },
     // 水球图
     sphereChart(quality, value, degree) {

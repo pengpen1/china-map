@@ -263,7 +263,7 @@ export default {
       opacity: 1,
     });
     const sideMaterial = new THREE.MeshLambertMaterial({
-      color: "#ffffff",
+      color: "#8cb9e8",
       transparent: true,
       opacity: 0.9,
     });
@@ -351,21 +351,22 @@ export default {
 
     // 初始化中国轮廓地图
     const ChinaOutlineParams = {
+      // 需要的参数
       lines: [],
       positions: null,
       opacitys: null,
       points: null,
       geometry: null,
+      // 速度控制
       currentPos: 0,
-      pointSpeed: 20,
+      currentPos1: 1800,
+      currentPos2: 3600,
+      pointSpeed: 10,
+      // 追光控制
+      pointSize: 4.0,
+      pointColor: "#ffffff",
     };
     const initChinaOutline = async (scene) => {
-      // 以北京为中心 修改坐标
-      const projection = d3
-        .geoMercator()
-        .center([116.412318, 39.909843])
-        .translate([0, 0]);
-
       let indexBol = true;
 
       /**
@@ -373,26 +374,35 @@ export default {
        * @param polygon 多边形 点数组
        * @param color 材质颜色
        * */
-      function lineDraw(polygon, color) {
-        const lineGeometry = new THREE.BufferGeometry();
-        const pointsArray = new Array();
+      // function lineDraw(polygon, color) {
+      //   const lineGeometry = new THREE.BufferGeometry();
+      //   const pointsArray = new Array();
+      //   polygon.forEach((row) => {
+      //     const [x, y] = row;
+      //     // 创建三维点
+      //     pointsArray.push(new THREE.Vector3(x, -y, 0));
+      //     console.log(indexBol);
+      //     if (indexBol) {
+      //       ChinaOutlineParams.lines.push([x, -y, 0]);
+      //     }
+      //   });
+      //   indexBol = false;
+      //   // 放入多个点
+      //   lineGeometry.setFromPoints(pointsArray);
+
+      //   const lineMaterial = new THREE.LineBasicMaterial({
+      //     color: color,
+      //   });
+      //   return new THREE.Line(lineGeometry, lineMaterial);
+      // }
+      // 只是要追光效果的话不需要画地图
+      function lineDraw(polygon) {
         polygon.forEach((row) => {
-          const [x, y] = projection(row);
+          const [x, y] = row;
           // 创建三维点
-          pointsArray.push(new THREE.Vector3(x, -y, 0));
-          console.log(indexBol);
-          if (indexBol) {
-            ChinaOutlineParams.lines.push([x, -y, 0]);
-          }
+          ChinaOutlineParams.lines.push([x, -y, 0]);
         });
         indexBol = false;
-        // 放入多个点
-        lineGeometry.setFromPoints(pointsArray);
-
-        const lineMaterial = new THREE.LineBasicMaterial({
-          color: color,
-        });
-        return new THREE.Line(lineGeometry, lineMaterial);
       }
 
       const chinaData = await requestData("./data/map/中国轮廓.json");
@@ -400,22 +410,154 @@ export default {
 
       // 中国边界
       const feature = chinaData.features[0];
-      const province = new THREE.Object3D();
-      province.properties = feature.properties.name;
+      // const province = new THREE.Object3D();
+      // province.properties = feature.properties.name;
       // 点数据
       const coordinates = feature.geometry.coordinates;
-
       coordinates.forEach((coordinate) => {
         // coordinate 多边形数据
         coordinate.forEach((rows) => {
-          const line = lineDraw(rows, 0xffffff);
-          province.add(line);
+          const line = lineDraw(rows, 0xe10909);
+          // province.add(line);
         });
       });
 
-      province.position.set(114, 38, 0);
-      province.scale.set(0.35, 0.35, 0.35);
-      scene.add(province);
+      // province.position.set(0, 0, 2);
+      // province.rotation.set(0, Math.PI, Math.PI);
+      // scene.add(province);
+
+      // 着色器相关
+      ChinaOutlineParams.geometry = new THREE.BufferGeometry();
+      ChinaOutlineParams.positions = new Float32Array(
+        ChinaOutlineParams.lines.flat(1)
+      );
+      // 设置顶点
+      ChinaOutlineParams.geometry.setAttribute(
+        "position",
+        new THREE.BufferAttribute(ChinaOutlineParams.positions, 3)
+      );
+      // 设置 粒子透明度为 0
+      ChinaOutlineParams.opacitys = new Float32Array(
+        ChinaOutlineParams.positions.length
+      ).map(() => 0);
+      ChinaOutlineParams.geometry.setAttribute(
+        "aOpacity",
+        new THREE.BufferAttribute(ChinaOutlineParams.opacitys, 1)
+      );
+
+      const vertexShader = `
+        attribute float aOpacity;
+        uniform float uSize;
+        varying float vOpacity;
+
+        void main(){
+            gl_Position = projectionMatrix*modelViewMatrix*vec4(position,1.0);
+            gl_PointSize = uSize;
+
+            vOpacity=aOpacity;
+        }
+        `;
+
+      const fragmentShader = `
+        varying float vOpacity;
+        uniform vec3 uColor;
+
+        float invert(float n){
+            return 1.-n;
+        }
+
+        void main(){
+          if(vOpacity <=0.2){
+              discard;
+          }
+          vec2 uv=vec2(gl_PointCoord.x,invert(gl_PointCoord.y));
+          vec2 cUv=2.*uv-1.;
+          vec4 color=vec4(1./length(cUv));
+          color*=vOpacity;
+          color.rgb*=uColor;
+          gl_FragColor=color;
+        }
+        `;
+      const material = new THREE.ShaderMaterial({
+        vertexShader: vertexShader,
+        fragmentShader: fragmentShader,
+        transparent: true, // 设置透明
+        emissive: 0xff0000,
+        lending: THREE.AdditiveBlending, //在使用此材质显示对象时要使用何种混合。加法
+        uniforms: {
+          uSize: {
+            value: ChinaOutlineParams.pointSize,
+          },
+          uColor: {
+            value: new THREE.Color(ChinaOutlineParams.pointColor),
+          },
+        },
+      });
+      ChinaOutlineParams.points = new THREE.Points(
+        ChinaOutlineParams.geometry,
+        material
+      );
+      scene.add(ChinaOutlineParams.points);
+
+      ChinaOutlineParams.points.position.set(0, 0, 0.5);
+      ChinaOutlineParams.points.rotation.set(0, Math.PI, Math.PI);
+      //UI设计  12秒1圈   长度大概是 64/360
+      // 渲染
+      function render() {
+        // console.log(ChinaOutlineParams.currentPos, ChinaOutlineParams.lines);
+        if (
+          ChinaOutlineParams.points &&
+          ChinaOutlineParams.geometry.attributes.position
+        ) {
+          ChinaOutlineParams.currentPos += ChinaOutlineParams.pointSpeed;
+          for (let i = 0; i < ChinaOutlineParams.pointSpeed; i++) {
+            ChinaOutlineParams.opacitys[
+              (ChinaOutlineParams.currentPos - i) %
+                ChinaOutlineParams.lines.length
+            ] = 0;
+          }
+
+          for (let i = 0; i < 888; i++) {
+            ChinaOutlineParams.opacitys[
+              (ChinaOutlineParams.currentPos + i) %
+                ChinaOutlineParams.lines.length
+            ] = i / 50 > 2 ? 2 : i / 50;
+          }
+
+          ChinaOutlineParams.currentPos1 += ChinaOutlineParams.pointSpeed;
+          for (let i = 0; i < ChinaOutlineParams.pointSpeed; i++) {
+            ChinaOutlineParams.opacitys[
+              (ChinaOutlineParams.currentPos1 - i) %
+                ChinaOutlineParams.lines.length
+            ] = 0;
+          }
+
+          for (let i = 0; i < 888; i++) {
+            ChinaOutlineParams.opacitys[
+              (ChinaOutlineParams.currentPos1 + i) %
+                ChinaOutlineParams.lines.length
+            ] = i / 50 > 2 ? 2 : i / 50;
+          }
+
+          ChinaOutlineParams.currentPos2 += ChinaOutlineParams.pointSpeed;
+          for (let i = 0; i < ChinaOutlineParams.pointSpeed; i++) {
+            ChinaOutlineParams.opacitys[
+              (ChinaOutlineParams.currentPos2 - i) %
+                ChinaOutlineParams.lines.length
+            ] = 0;
+          }
+
+          for (let i = 0; i < 300; i++) {
+            ChinaOutlineParams.opacitys[
+              (ChinaOutlineParams.currentPos2 + i) %
+                ChinaOutlineParams.lines.length
+            ] = i / 50 > 2 ? 2 : i / 50;
+          }
+          ChinaOutlineParams.geometry.attributes.aOpacity.needsUpdate = true;
+        }
+        requestAnimationFrame(render);
+      }
+      requestAnimationFrame(render);
     };
     // 初始化原点
     const initCirclePoint = (scene, width) => {
@@ -626,11 +768,11 @@ export default {
                     topFaceMaterial,
                     sideMaterial,
                   ]);
-                  if (index % 2 === 0) {
-                    // 凹凸效果
-                    mesh.scale.set(1, 1, 1.2);
-                    //  topFaceMaterial.color = new THREE.Color("#ffffff"); //这样设置所有都被修改了
-                  }
+                  // if (index % 2 === 0) {
+                  //   // 凹凸效果
+                  //   mesh.scale.set(1, 1, 1.2);
+                  //   //  topFaceMaterial.color = new THREE.Color("#ffffff"); //这样设置所有都被修改了
+                  // }
                   // mesh.material.opacity = 0; // 初始透明度为 0，无效
                   province.add(mesh);
                 });

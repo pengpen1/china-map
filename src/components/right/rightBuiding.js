@@ -160,11 +160,11 @@ export default {
       effectPolice.style.cssText =
         "animation: rightBuiding 2s 1s forwards; opacity: 0";
       effectMonitor.style.cssText =
-        "animation: rightBuiding 3s 1s forwards; opacity: 0";
+        "animation: rightBuiding 2.5s 1s forwards; opacity: 0";
       effectVehicle.style.cssText =
-        "animation: rightBuiding 4s 1s forwards; opacity: 0";
+        "animation: rightBuiding 3s 1s forwards; opacity: 0";
       effectLighting.style.cssText =
-        "animation: rightBuiding 5s 1s forwards; opacity: 0";
+        "animation: rightBuiding 3.5s 1s forwards; opacity: 0";
     },
   },
 };
