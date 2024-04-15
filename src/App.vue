@@ -92,7 +92,9 @@
 
 <script>
 import Map3d from "@/utils/Map3d.js";
-import * as d3 from "d3";
+import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass";
+import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass";
+import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer";
 import TWEEN from "@tweenjs/tween.js";
 import gsap from "gsap";
 import * as THREE from "three";
@@ -113,40 +115,346 @@ import rightBuiding from "./components/right/rightBuiding.vue";
 let centerXY = [104.114129, 7.550339];
 const COLOR_ARR = ["#0465BD", "#357bcb", "#3d658a"];
 const ADCODE = [
-  { adcode: "110000", name: "北京市" },
-  { adcode: "120000", name: "天津市" },
-  { adcode: "130000", name: "河北省" },
-  { adcode: "140000", name: "山西省" },
-  { adcode: "150000", name: "内蒙古自治区" },
-  { adcode: "210000", name: "辽宁省" },
-  { adcode: "220000", name: "吉林省" },
-  { adcode: "230000", name: "黑龙江省" },
-  { adcode: "310000", name: "上海市" },
-  { adcode: "320000", name: "江苏省" },
-  { adcode: "330000", name: "浙江省" },
-  { adcode: "340000", name: "安徽省" },
-  { adcode: "350000", name: "福建省" },
-  { adcode: "360000", name: "江西省" },
-  { adcode: "370000", name: "山东省" },
-  { adcode: "410000", name: "河南省" },
-  { adcode: "420000", name: "湖北省" },
-  { adcode: "430000", name: "湖南省" },
-  { adcode: "440000", name: "广东省" },
-  { adcode: "450000", name: "广西壮族自治区" },
-  { adcode: "460000", name: "海南省" },
-  { adcode: "500000", name: "重庆市" },
-  { adcode: "510000", name: "四川省" },
-  { adcode: "520000", name: "贵州省" },
-  { adcode: "530000", name: "云南省" },
-  { adcode: "540000", name: "西藏自治区" },
-  { adcode: "610000", name: "陕西省" },
-  { adcode: "620000", name: "甘肃省" },
-  { adcode: "630000", name: "青海省" },
-  { adcode: "640000", name: "宁夏回族自治区" },
-  { adcode: "650000", name: "新疆维吾尔自治区" },
-  { adcode: "710000", name: "台湾省" },
-  { adcode: "810000", name: "香港特别行政区" },
-  { adcode: "820000", name: "澳门特别行政区" },
+  {
+    adcode: "110000",
+    name: "北京",
+    centroid: [116.41995, 40.18994],
+    reportStatus: 2, //未接入0，已上报1，未上报2
+    riskLevel: 0, //低危0，中危1，高危2
+    topColor: "#1C2E3B", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#1C2E3B，为1时颜色为#36ABD2，为2时颜色为#20415B
+    sideColor: "#9EF2FF", //侧边颜色
+    markSize: 16,
+  },
+  {
+    adcode: "120000",
+    name: "天津",
+    centroid: [117.347043, 39.288036],
+    reportStatus: 2, //未接入0，已上报1，未上报2
+    riskLevel: 0, //低危0，中危1，高危2
+    topColor: "#1C2E3B", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#1C2E3B，为1时颜色为#36ABD2，为2时颜色为#20415B
+    sideColor: "#9EF2FF", //侧边颜色
+    markSize: 16,
+  },
+  {
+    adcode: "130000",
+    name: "河北",
+    centroid: [114.502461, 38.045474],
+    reportStatus: 2, //未接入0，已上报1，未上报2
+    riskLevel: 0, //低危0，中危1，高危2
+    topColor: "#1C2E3B", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#1C2E3B，为1时颜色为#36ABD2，为2时颜色为#20415B
+    sideColor: "#9EF2FF", //侧边颜色
+    markSize: 16,
+  },
+  {
+    adcode: "140000",
+    name: "山西",
+    centroid: [112.304436, 37.618179],
+    reportStatus: 2, //未接入0，已上报1，未上报2
+    riskLevel: 0, //低危0，中危1，高危2
+    topColor: "#1C2E3B", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#1C2E3B，为1时颜色为#36ABD2，为2时颜色为#20415B
+    sideColor: "#9EF2FF", //侧边颜色
+    markSize: 16,
+  },
+  {
+    adcode: "150000",
+    name: "内蒙古",
+    centroid: [114.077429, 44.331087],
+    reportStatus: 2, //未接入0，已上报1，未上报2
+    riskLevel: 0, //低危0，中危1，高危2
+    topColor: "#1C2E3B", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#1C2E3B，为1时颜色为#36ABD2，为2时颜色为#20415B
+    sideColor: "#9EF2FF", //侧边颜色
+    markSize: 16,
+  },
+  {
+    adcode: "210000",
+    name: "辽宁",
+    centroid: [122.604994, 41.299712],
+    reportStatus: 2, //未接入0，已上报1，未上报2
+    riskLevel: 0, //低危0，中危1，高危2
+    topColor: "#1C2E3B", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#1C2E3B，为1时颜色为#36ABD2，为2时颜色为#20415B
+    sideColor: "#9EF2FF", //侧边颜色
+    markSize: 16,
+  },
+  {
+    adcode: "220000",
+    name: "吉林",
+    centroid: [126.171208, 43.703954],
+    reportStatus: 2, //未接入0，已上报1，未上报2
+    riskLevel: 0, //低危0，中危1，高危2
+    topColor: "#1C2E3B", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#1C2E3B，为1时颜色为#36ABD2，为2时颜色为#20415B
+    sideColor: "#9EF2FF", //侧边颜色
+    markSize: 16,
+  },
+  {
+    adcode: "230000",
+    name: "黑龙江",
+    centroid: [127.693027, 48.040465],
+    reportStatus: 2, //未接入0，已上报1，未上报2
+    riskLevel: 0, //低危0，中危1，高危2
+    topColor: "#1C2E3B", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#1C2E3B，为1时颜色为#36ABD2，为2时颜色为#20415B
+    sideColor: "#9EF2FF", //侧边颜色
+    markSize: 16,
+  },
+  {
+    adcode: "310000",
+    name: "上海",
+    centroid: [121.438737, 31.072559],
+    reportStatus: 2, //未接入0，已上报1，未上报2
+    riskLevel: 0, //低危0，中危1，高危2
+    topColor: "#1C2E3B", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#1C2E3B，为1时颜色为#36ABD2，为2时颜色为#20415B
+    sideColor: "#9EF2FF", //侧边颜色
+    markSize: 16,
+  },
+  {
+    adcode: "320000",
+    name: "江苏",
+    centroid: [119.486506, 32.983991],
+    reportStatus: 2, //未接入0，已上报1，未上报2
+    riskLevel: 0, //低危0，中危1，高危2
+    topColor: "#1C2E3B", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#1C2E3B，为1时颜色为#36ABD2，为2时颜色为#20415B
+    sideColor: "#9EF2FF", //侧边颜色
+    markSize: 16,
+  },
+  {
+    adcode: "330000",
+    name: "浙江",
+    centroid: [120.109913, 29.181466],
+    reportStatus: 2, //未接入0，已上报1，未上报2
+    riskLevel: 0, //低危0，中危1，高危2
+    topColor: "#1C2E3B", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#1C2E3B，为1时颜色为#36ABD2，为2时颜色为#20415B
+    sideColor: "#9EF2FF", //侧边颜色
+    markSize: 16,
+  },
+  {
+    adcode: "340000",
+    name: "安徽",
+    centroid: [117.226884, 31.849254],
+    reportStatus: 2, //未接入0，已上报1，未上报2
+    riskLevel: 0, //低危0，中危1，高危2
+    topColor: "#1C2E3B", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#1C2E3B，为1时颜色为#36ABD2，为2时颜色为#20415B
+    sideColor: "#9EF2FF", //侧边颜色
+    markSize: 16,
+  },
+  {
+    adcode: "350000",
+    name: "福建",
+    centroid: [118.006468, 26.069925],
+    reportStatus: 2, //未接入0，已上报1，未上报2
+    riskLevel: 0, //低危0，中危1，高危2
+    topColor: "#1C2E3B", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#1C2E3B，为1时颜色为#36ABD2，为2时颜色为#20415B
+    sideColor: "#9EF2FF", //侧边颜色
+    markSize: 16,
+  },
+  {
+    adcode: "360000",
+    name: "江西",
+    centroid: [115.732975, 27.636112],
+    reportStatus: 2, //未接入0，已上报1，未上报2
+    riskLevel: 0, //低危0，中危1，高危2
+    topColor: "#1C2E3B", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#1C2E3B，为1时颜色为#36ABD2，为2时颜色为#20415B
+    sideColor: "#9EF2FF", //侧边颜色
+    markSize: 16,
+  },
+  {
+    adcode: "370000",
+    name: "山东",
+    centroid: [118.187759, 36.376092],
+    reportStatus: 2, //未接入0，已上报1，未上报2
+    riskLevel: 0, //低危0，中危1，高危2
+    topColor: "#1C2E3B", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#1C2E3B，为1时颜色为#36ABD2，为2时颜色为#20415B
+    sideColor: "#9EF2FF", //侧边颜色
+    markSize: 16,
+  },
+  {
+    adcode: "410000",
+    name: "河南",
+    centroid: [113.619717, 33.902648],
+    reportStatus: 2, //未接入0，已上报1，未上报2
+    riskLevel: 0, //低危0，中危1，高危2
+    topColor: "#1C2E3B", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#1C2E3B，为1时颜色为#36ABD2，为2时颜色为#20415B
+    sideColor: "#9EF2FF", //侧边颜色
+    markSize: 16,
+  },
+  {
+    adcode: "420000",
+    name: "湖北",
+    centroid: [112.271301, 30.987527],
+    reportStatus: 2, //未接入0，已上报1，未上报2
+    riskLevel: 0, //低危0，中危1，高危2
+    topColor: "#1C2E3B", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#1C2E3B，为1时颜色为#36ABD2，为2时颜色为#20415B
+    sideColor: "#9EF2FF", //侧边颜色
+    markSize: 16,
+  },
+  {
+    adcode: "430000",
+    name: "湖南",
+    centroid: [111.711649, 27.629216],
+    reportStatus: 2, //未接入0，已上报1，未上报2
+    riskLevel: 0, //低危0，中危1，高危2
+    topColor: "#1C2E3B", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#1C2E3B，为1时颜色为#36ABD2，为2时颜色为#20415B
+    sideColor: "#9EF2FF", //侧边颜色
+    markSize: 16,
+  },
+  {
+    adcode: "440000",
+    name: "广东",
+    centroid: [113.429919, 23.334643],
+    reportStatus: 2, //未接入0，已上报1，未上报2
+    riskLevel: 0, //低危0，中危1，高危2
+    topColor: "#1C2E3B", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#1C2E3B，为1时颜色为#36ABD2，为2时颜色为#20415B
+    sideColor: "#9EF2FF", //侧边颜色
+    markSize: 16,
+  },
+  {
+    adcode: "450000",
+    name: "广西",
+    centroid: [108.7944, 23.833381],
+    reportStatus: 2, //未接入0，已上报1，未上报2
+    riskLevel: 0, //低危0，中危1，高危2
+    topColor: "#1C2E3B", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#1C2E3B，为1时颜色为#36ABD2，为2时颜色为#20415B
+    sideColor: "#9EF2FF", //侧边颜色
+    markSize: 16,
+  },
+  {
+    adcode: "460000",
+    name: "海南",
+    centroid: [109.754859, 19.189767],
+    reportStatus: 2, //未接入0，已上报1，未上报2
+    riskLevel: 0, //低危0，中危1，高危2
+    topColor: "#1C2E3B", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#1C2E3B，为1时颜色为#36ABD2，为2时颜色为#20415B
+    sideColor: "#9EF2FF", //侧边颜色
+    markSize: 16,
+  },
+  {
+    adcode: "500000",
+    name: "重庆",
+    centroid: [107.8839, 30.067297],
+    reportStatus: 2, //未接入0，已上报1，未上报2
+    riskLevel: 0, //低危0，中危1，高危2
+    topColor: "#1C2E3B", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#1C2E3B，为1时颜色为#36ABD2，为2时颜色为#20415B
+    sideColor: "#9EF2FF", //侧边颜色
+    markSize: 16,
+  },
+  {
+    adcode: "510000",
+    name: "四川",
+    centroid: [102.693453, 30.674545],
+    reportStatus: 0, //未接入0，已上报1，未上报2
+    riskLevel: 0, //低危0，中危1，高危2
+    topColor: "#1C2E3B", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#1C2E3B，为1时颜色为#36ABD2，为2时颜色为#20415B
+    sideColor: "#9EF2FF", //侧边颜色
+    markSize: 16,
+  },
+  {
+    adcode: "520000",
+    name: "贵州",
+    centroid: [106.880455, 26.826368],
+    reportStatus: 2, //未接入0，已上报1，未上报2
+    riskLevel: 0, //低危0，中危1，高危2
+    topColor: "#1C2E3B", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#1C2E3B，为1时颜色为#36ABD2，为2时颜色为#20415B
+    sideColor: "#9EF2FF", //侧边颜色
+    markSize: 16,
+  },
+  {
+    adcode: "530000",
+    name: "云南",
+    centroid: [101.485106, 25.008643],
+    reportStatus: 2, //未接入0，已上报1，未上报2
+    riskLevel: 0, //低危0，中危1，高危2
+    topColor: "#1C2E3B", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#1C2E3B，为1时颜色为#36ABD2，为2时颜色为#20415B
+    sideColor: "#9EF2FF", //侧边颜色
+    markSize: 16,
+  },
+  {
+    adcode: "540000",
+    name: "西藏",
+    centroid: [88.388277, 31.56375],
+    reportStatus: 1, //未接入0，已上报1，未上报2
+    riskLevel: 1, //低危0，中危1，高危2
+    topColor: "#36ABD2", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#1C2E3B，为1时颜色为#36ABD2，为2时颜色为#20415B
+    sideColor: "#9EF2FF", //侧边颜色
+    markSize: 16,
+  },
+  {
+    adcode: "610000",
+    name: "陕西",
+    centroid: [108.887114, 35.263661],
+    reportStatus: 2, //未接入0，已上报1，未上报2
+    riskLevel: 0, //低危0，中危1，高危2
+    topColor: "#1C2E3B", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#1C2E3B，为1时颜色为#36ABD2，为2时颜色为#20415B
+    sideColor: "#9EF2FF", //侧边颜色
+    markSize: 16,
+  },
+  {
+    adcode: "620000",
+    name: "甘肃",
+    centroid: [103.823557, 36.058039],
+    reportStatus: 2, //未接入0，已上报1，未上报2
+    riskLevel: 0, //低危0，中危1，高危2
+    topColor: "#1C2E3B", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#1C2E3B，为1时颜色为#36ABD2，为2时颜色为#20415B
+    sideColor: "#9EF2FF", //侧边颜色
+    markSize: 16,
+  },
+  {
+    adcode: "630000",
+    name: "青海",
+    centroid: [96.043533, 35.726403],
+    reportStatus: 0, //未接入0，已上报1，未上报2
+    riskLevel: 0, //低危0，中危1，高危2
+    topColor: "#1C2E3B", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#1C2E3B，为1时颜色为#36ABD2，为2时颜色为#20415B
+    sideColor: "#9EF2FF", //侧边颜色
+    markSize: 16,
+  },
+  {
+    adcode: "640000",
+    name: "宁夏",
+    centroid: [106.169866, 37.291332],
+    reportStatus: 2, //未接入0，已上报1，未上报2
+    riskLevel: 0, //低危0，中危1，高危2
+    topColor: "#1C2E3B", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#1C2E3B，为1时颜色为#36ABD2，为2时颜色为#20415B
+    sideColor: "#9EF2FF", //侧边颜色
+    markSize: 16,
+  },
+  {
+    adcode: "650000",
+    name: "新疆",
+    centroid: [85.294711, 41.371801],
+    reportStatus: 1, //未接入0，已上报1，未上报2
+    riskLevel: 2, //低危0，中危1，高危2
+    topColor: "#36ABD2", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#1C2E3B，为1时颜色为#36ABD2，为2时颜色为#20415B
+    sideColor: "#9EF2FF", //侧边颜色
+    markSize: 16,
+  },
+  {
+    adcode: "710000",
+    name: "台湾",
+    centroid: [120.971485, 23.749452],
+    reportStatus: 2, //未接入0，已上报1，未上报2
+    riskLevel: 0, //低危0，中危1，高危2
+    topColor: "#1C2E3B", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#1C2E3B，为1时颜色为#36ABD2，为2时颜色为#20415B
+    sideColor: "#9EF2FF", //侧边颜色
+    markSize: 16,
+  },
+  {
+    adcode: "810000",
+    name: "香港",
+    centroid: [114.134357, 22.377366],
+    reportStatus: 2, //未接入0，已上报1，未上报2
+    riskLevel: 0, //低危0，中危1，高危2
+    topColor: "#1C2E3B", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#1C2E3B，为1时颜色为#36ABD2，为2时颜色为#20415B
+    sideColor: "#9EF2FF", //侧边颜色
+    markSize: 16,
+  },
+  {
+    adcode: "820000",
+    name: "澳门",
+    centroid: [113.566988, 22.159307],
+    reportStatus: 2, //未接入0，已上报1，未上报2
+    riskLevel: 0, //低危0，中危1，高危2
+    topColor: "#1C2E3B", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#1C2E3B，为1时颜色为#36ABD2，为2时颜色为#20415B
+    sideColor: "#9EF2FF", //侧边颜色
+    markSize: 16,
+  },
 ];
 const adCodeMap = {
   北京市: 110000,
@@ -240,8 +548,8 @@ export default {
       markColor: 0xe10909,
       showBackground: true,
       adcodeMap: 510000,
-      showCharts: true,
-      showAperture: true,
+      showCharts: false,
+      showAperture: false,
       rotatingApertureMesh: null,
       rotatingPointMesh: null,
     };
@@ -363,7 +671,7 @@ export default {
       currentPos2: 3600,
       pointSpeed: 10,
       // 追光控制
-      pointSize: 4.0,
+      pointSize: 5.0,
       pointColor: "#ffffff",
     };
     const initChinaOutline = async (scene) => {
@@ -670,8 +978,10 @@ export default {
 
     onMounted(async () => {
       // 图表相关
-      currentTime();
-      animation();
+      if (showCharts.value) {
+        currentTime();
+        animation();
+      }
 
       // 中国地图数据
       let provinceData = await requestData("./data/map/中华人民共和国.json");
@@ -760,7 +1070,8 @@ export default {
                   const color = COLOR_ARR[index % COLOR_ARR.length];
                   const topFaceMaterial = new THREE.MeshPhongMaterial({
                     color,
-                    combine: THREE.MultiplyOperation,
+                    // emissive: color,
+                    // combine: THREE.MultiplyOperation,
                     transparent: true,
                     opacity: 1,
                   });
@@ -768,11 +1079,11 @@ export default {
                     topFaceMaterial,
                     sideMaterial,
                   ]);
-                  // if (index % 2 === 0) {
-                  //   // 凹凸效果
-                  //   mesh.scale.set(1, 1, 1.2);
-                  //   //  topFaceMaterial.color = new THREE.Color("#ffffff"); //这样设置所有都被修改了
-                  // }
+                  if (index % 2 === 0) {
+                    // 凹凸效果
+                    mesh.scale.set(1, 1, 1.5);
+                    //  topFaceMaterial.color = new THREE.Color("#ffffff"); //这样设置所有都被修改了
+                  }
                   // mesh.material.opacity = 0; // 初始透明度为 0，无效
                   province.add(mesh);
                 });
@@ -796,12 +1107,16 @@ export default {
             let { size } = earthGroupBound;
             let width = size.x < size.y ? size.y + 1 : size.x + 1;
             // 添加背景，修饰元素
-            this.rotatingApertureMesh = guiParams.rotatingApertureMesh =
-              initRotatingAperture(this.scene, width);
-            this.rotatingPointMesh = guiParams.rotatingPointMesh =
-              initRotatingPoint(this.scene, width - 2);
-            initCirclePoint(this.scene, width);
-            initSceneBg(this.scene, 40);
+            if (guiParams.showAperture) {
+              this.rotatingApertureMesh = guiParams.rotatingApertureMesh =
+                initRotatingAperture(this.scene, width);
+              this.rotatingPointMesh = guiParams.rotatingPointMesh =
+                initRotatingPoint(this.scene, width - 2);
+              initCirclePoint(this.scene, width);
+            }
+            if (guiParams.showBackground) {
+              initSceneBg(this.scene, 40);
+            }
             initChinaOutline(this.scene);
             console.log(ChinaOutlineParams);
 
@@ -856,6 +1171,28 @@ export default {
         initRenderer() {
           super.initRenderer();
           // this.renderer.outputEncoding = THREE.sRGBEncoding
+
+          // {
+          //   let { width, height } = this.options;
+          //   // 添加后期处理效果
+          //   this.composer = new EffectComposer(this.renderer);
+          //   this.composer.setSize(width, height);
+          //   const renderPass = new RenderPass(this.scene, this.camera);
+          //   this.composer.addPass(renderPass);
+
+          //   // 配置UnrealBloomPass
+          //   const bloomPass = new UnrealBloomPass(
+          //     // 泛光的画布大小
+          //     new THREE.Vector2(width, height),
+          //     // 泛光效果的强度
+          //     0.5,
+          //     // 泛光效果的半径
+          //     0.5,
+          //     // 泛光效果的阈值
+          //     0.6
+          //   );
+          //   this.composer.addPass(bloomPass);
+          // }
         }
         loop() {
           this.animationStop = window.requestAnimationFrame(() => {
@@ -896,6 +1233,9 @@ export default {
           //   }
           // }
           TWEEN.update();
+          if (this.composer) {
+            this.composer.render();
+          }
           // console.log(this.camera.position)
         }
         resize() {
@@ -1031,7 +1371,7 @@ export default {
 
     const timeDate = ref(null);
     const userName = ref(null);
-    const showCharts = ref(true);
+    const showCharts = ref(false);
 
     return {
       displayData,

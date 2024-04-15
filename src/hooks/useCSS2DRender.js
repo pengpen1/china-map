@@ -55,12 +55,13 @@ export default function useCSS2DRender() {
       labelWrap.style.background = "rgba(198,195,195,0.6)";
       labelWrap.style.padding = "2px 4px";
 
-      const otherWrap = document.createElement("div");
-      otherWrap.innerHTML = "拼音或者上报情况";
-      otherWrap.style.color = "#fff";
-      otherWrap.style.padding = "2px 4px";
+      // const otherWrap = document.createElement("div");
+      // otherWrap.innerHTML = "拼音或者上报情况";
+      // otherWrap.style.color = "#fff";
+      // otherWrap.style.padding = "2px 4px";
 
-      label.element.append(labelWrap, otherWrap);
+      // label.element.append(labelWrap, otherWrap);
+      label.element.append(labelWrap);
       label.element.style.visibility = "visible";
       label.element.style.display = "flex";
       label.position.copy(point);
