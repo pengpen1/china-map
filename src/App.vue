@@ -125,7 +125,7 @@ const ADCODE = [
     riskLevel: 0, //低危0，中危1，高危2
     topColor: "#0f1214", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#0f1214，为1时颜色为#2890f0，为2时颜色为#0d3854
     sideColor: "#4e8da2", //侧边颜色
-    markSize: 16,
+    markSize: 80,
   },
   {
     adcode: 120000,
@@ -137,7 +137,7 @@ const ADCODE = [
     riskLevel: 0, //低危0，中危1，高危2
     topColor: "#0f1214", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#0f1214，为1时颜色为#2890f0，为2时颜色为#0d3854
     sideColor: "#4e8da2", //侧边颜色
-    markSize: 16,
+    markSize: 80,
   },
   {
     adcode: 130000,
@@ -149,7 +149,7 @@ const ADCODE = [
     riskLevel: 0, //低危0，中危1，高危2
     topColor: "#0f1214", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#0f1214，为1时颜色为#2890f0，为2时颜色为#0d3854
     sideColor: "#4e8da2", //侧边颜色
-    markSize: 16,
+    markSize: 80,
   },
   {
     adcode: 140000,
@@ -161,7 +161,7 @@ const ADCODE = [
     riskLevel: 0, //低危0，中危1，高危2
     topColor: "#0f1214", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#0f1214，为1时颜色为#2890f0，为2时颜色为#0d3854
     sideColor: "#4e8da2", //侧边颜色
-    markSize: 16,
+    markSize: 80,
   },
   {
     adcode: 150000,
@@ -173,7 +173,7 @@ const ADCODE = [
     riskLevel: 0, //低危0，中危1，高危2
     topColor: "#0d3854", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#0f1214，为1时颜色为#2890f0，为2时颜色为#0d3854
     sideColor: "#4e8da2", //侧边颜色
-    markSize: 16,
+    markSize: 80,
   },
   {
     adcode: 210000,
@@ -185,7 +185,7 @@ const ADCODE = [
     riskLevel: 0, //低危0，中危1，高危2
     topColor: "#0f1214", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#0f1214，为1时颜色为#2890f0，为2时颜色为#0d3854
     sideColor: "#4e8da2", //侧边颜色
-    markSize: 16,
+    markSize: 80,
   },
   {
     adcode: 220000,
@@ -197,7 +197,7 @@ const ADCODE = [
     riskLevel: 0, //低危0，中危1，高危2
     topColor: "#0f1214", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#0f1214，为1时颜色为#2890f0，为2时颜色为#0d3854
     sideColor: "#4e8da2", //侧边颜色
-    markSize: 16,
+    markSize: 80,
   },
   {
     adcode: 230000,
@@ -209,7 +209,7 @@ const ADCODE = [
     riskLevel: 0, //低危0，中危1，高危2
     topColor: "#2890f0", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#0f1214，为1时颜色为#2890f0，为2时颜色为#0d3854
     sideColor: "#4e8da2", //侧边颜色
-    markSize: 16,
+    markSize: 100,
   },
   {
     adcode: 310000,
@@ -221,7 +221,7 @@ const ADCODE = [
     riskLevel: 0, //低危0，中危1，高危2
     topColor: "#0f1214", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#0f1214，为1时颜色为#2890f0，为2时颜色为#0d3854
     sideColor: "#4e8da2", //侧边颜色
-    markSize: 16,
+    markSize: 60,
   },
   {
     adcode: 320000,
@@ -233,7 +233,7 @@ const ADCODE = [
     riskLevel: 0, //低危0，中危1，高危2
     topColor: "#0f1214", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#0f1214，为1时颜色为#2890f0，为2时颜色为#0d3854
     sideColor: "#4e8da2", //侧边颜色
-    markSize: 16,
+    markSize: 80,
   },
   {
     adcode: 330000,
@@ -245,7 +245,7 @@ const ADCODE = [
     riskLevel: 0, //低危0，中危1，高危2
     topColor: "#2890f0", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#0f1214，为1时颜色为#2890f0，为2时颜色为#0d3854
     sideColor: "#4e8da2", //侧边颜色
-    markSize: 16,
+    markSize: 80,
   },
   {
     adcode: 340000,
@@ -257,7 +257,7 @@ const ADCODE = [
     riskLevel: 0, //低危0，中危1，高危2
     topColor: "#0f1214", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#0f1214，为1时颜色为#2890f0，为2时颜色为#0d3854
     sideColor: "#4e8da2", //侧边颜色
-    markSize: 16,
+    markSize: 80,
   },
   {
     adcode: 350000,
@@ -269,7 +269,7 @@ const ADCODE = [
     riskLevel: 0, //低危0，中危1，高危2
     topColor: "#0f1214", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#0f1214，为1时颜色为#2890f0，为2时颜色为#0d3854
     sideColor: "#4e8da2", //侧边颜色
-    markSize: 16,
+    markSize: 80,
   },
   {
     adcode: 360000,
@@ -281,7 +281,7 @@ const ADCODE = [
     riskLevel: 0, //低危0，中危1，高危2
     topColor: "#0f1214", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#0f1214，为1时颜色为#2890f0，为2时颜色为#0d3854
     sideColor: "#4e8da2", //侧边颜色
-    markSize: 16,
+    markSize: 80,
   },
   {
     adcode: 370000,
@@ -293,7 +293,7 @@ const ADCODE = [
     riskLevel: 0, //低危0，中危1，高危2
     topColor: "#0f1214", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#0f1214，为1时颜色为#2890f0，为2时颜色为#0d3854
     sideColor: "#4e8da2", //侧边颜色
-    markSize: 16,
+    markSize: 80,
   },
   {
     adcode: 410000,
@@ -305,7 +305,7 @@ const ADCODE = [
     riskLevel: 0, //低危0，中危1，高危2
     topColor: "#0d3854", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#0f1214，为1时颜色为#2890f0，为2时颜色为#0d3854
     sideColor: "#4e8da2", //侧边颜色
-    markSize: 16,
+    markSize: 80,
   },
   {
     adcode: 420000,
@@ -317,7 +317,7 @@ const ADCODE = [
     riskLevel: 0, //低危0，中危1，高危2
     topColor: "#0d3854", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#0f1214，为1时颜色为#2890f0，为2时颜色为#0d3854
     sideColor: "#4e8da2", //侧边颜色
-    markSize: 16,
+    markSize: 80,
   },
   {
     adcode: 430000,
@@ -329,7 +329,7 @@ const ADCODE = [
     riskLevel: 0, //低危0，中危1，高危2
     topColor: "#0d3854", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#0f1214，为1时颜色为#2890f0，为2时颜色为#0d3854
     sideColor: "#4e8da2", //侧边颜色
-    markSize: 16,
+    markSize: 80,
   },
   {
     adcode: 440000,
@@ -341,7 +341,7 @@ const ADCODE = [
     riskLevel: 0, //低危0，中危1，高危2
     topColor: "#2890f0", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#0f1214，为1时颜色为#2890f0，为2时颜色为#0d3854
     sideColor: "#4e8da2", //侧边颜色
-    markSize: 16,
+    markSize: 80,
   },
   {
     adcode: 450000,
@@ -353,7 +353,7 @@ const ADCODE = [
     riskLevel: 0, //低危0，中危1，高危2
     topColor: "#0d3854", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#0f1214，为1时颜色为#2890f0，为2时颜色为#0d3854
     sideColor: "#4e8da2", //侧边颜色
-    markSize: 16,
+    markSize: 80,
   },
   {
     adcode: 460000,
@@ -365,7 +365,7 @@ const ADCODE = [
     riskLevel: 0, //低危0，中危1，高危2
     topColor: "#0f1214", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#0f1214，为1时颜色为#2890f0，为2时颜色为#0d3854
     sideColor: "#4e8da2", //侧边颜色
-    markSize: 16,
+    markSize: 60,
   },
   {
     adcode: 500000,
@@ -377,7 +377,7 @@ const ADCODE = [
     riskLevel: 0, //低危0，中危1，高危2
     topColor: "#0f1214", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#0f1214，为1时颜色为#2890f0，为2时颜色为#0d3854
     sideColor: "#4e8da2", //侧边颜色
-    markSize: 16,
+    markSize: 80,
   },
   {
     adcode: 510000,
@@ -389,7 +389,7 @@ const ADCODE = [
     riskLevel: 0, //低危0，中危1，高危2
     topColor: "#0f1214", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#0f1214，为1时颜色为#2890f0，为2时颜色为#0d3854
     sideColor: "#4e8da2", //侧边颜色
-    markSize: 16,
+    markSize: 80,
   },
   {
     adcode: 520000,
@@ -401,7 +401,7 @@ const ADCODE = [
     riskLevel: 0, //低危0，中危1，高危2
     topColor: "#0d3854", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#0f1214，为1时颜色为#2890f0，为2时颜色为#0d3854
     sideColor: "#4e8da2", //侧边颜色
-    markSize: 16,
+    markSize: 80,
   },
   {
     adcode: 530000,
@@ -413,7 +413,7 @@ const ADCODE = [
     riskLevel: 0, //低危0，中危1，高危2
     topColor: "#0d3854", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#0f1214，为1时颜色为#2890f0，为2时颜色为#0d3854
     sideColor: "#4e8da2", //侧边颜色
-    markSize: 16,
+    markSize: 80,
   },
   {
     adcode: 540000,
@@ -425,7 +425,7 @@ const ADCODE = [
     riskLevel: 1, //低危0，中危1，高危2
     topColor: "#2890f0", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#0f1214，为1时颜色为#2890f0，为2时颜色为#0d3854
     sideColor: "#4e8da2", //侧边颜色
-    markSize: 16,
+    markSize: 120,
   },
   {
     adcode: 610000,
@@ -437,7 +437,7 @@ const ADCODE = [
     riskLevel: 0, //低危0，中危1，高危2
     topColor: "#0f1214", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#0f1214，为1时颜色为#2890f0，为2时颜色为#0d3854
     sideColor: "#4e8da2", //侧边颜色
-    markSize: 16,
+    markSize: 80,
   },
   {
     adcode: 620000,
@@ -449,7 +449,7 @@ const ADCODE = [
     riskLevel: 0, //低危0，中危1，高危2
     topColor: "#2890f0", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#0f1214，为1时颜色为#2890f0，为2时颜色为#0d3854
     sideColor: "#4e8da2", //侧边颜色
-    markSize: 16,
+    markSize: 80,
   },
   {
     adcode: 630000,
@@ -461,7 +461,7 @@ const ADCODE = [
     riskLevel: 0, //低危0，中危1，高危2
     topColor: "#0f1214", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#0f1214，为1时颜色为#2890f0，为2时颜色为#0d3854
     sideColor: "#4e8da2", //侧边颜色
-    markSize: 16,
+    markSize: 100,
   },
   {
     adcode: 640000,
@@ -473,7 +473,7 @@ const ADCODE = [
     riskLevel: 0, //低危0，中危1，高危2
     topColor: "#2890f0", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#0f1214，为1时颜色为#2890f0，为2时颜色为#0d3854
     sideColor: "#4e8da2", //侧边颜色
-    markSize: 16,
+    markSize: 80,
   },
   {
     adcode: 650000,
@@ -485,7 +485,7 @@ const ADCODE = [
     riskLevel: 2, //低危0，中危1，高危2
     topColor: "#2890f0", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#0f1214，为1时颜色为#2890f0，为2时颜色为#0d3854
     sideColor: "#4e8da2", //侧边颜色
-    markSize: 16,
+    markSize: 120,
   },
   {
     adcode: 710000,
@@ -497,7 +497,7 @@ const ADCODE = [
     riskLevel: 0, //低危0，中危1，高危2
     topColor: "#0f1214", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#0f1214，为1时颜色为#2890f0，为2时颜色为#0d3854
     sideColor: "#4e8da2", //侧边颜色
-    markSize: 16,
+    markSize: 60,
   },
   {
     adcode: 810000,
@@ -509,7 +509,7 @@ const ADCODE = [
     riskLevel: 0, //低危0，中危1，高危2
     topColor: "#0f1214", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#0f1214，为1时颜色为#2890f0，为2时颜色为#0d3854
     sideColor: "#4e8da2", //侧边颜色
-    markSize: 16,
+    markSize: 80,
   },
   {
     adcode: 820000,
@@ -521,7 +521,7 @@ const ADCODE = [
     riskLevel: 0, //低危0，中危1，高危2
     topColor: "#0f1214", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#0f1214，为1时颜色为#2890f0，为2时颜色为#0d3854
     sideColor: "#4e8da2", //侧边颜色
-    markSize: 16,
+    markSize: 80,
   },
 ];
 const ADCODE_MAP = new Map();
@@ -585,7 +585,7 @@ export default {
     const { transfromGeoJSON } = useConversionStandardData();
     const { getBoundingBox } = useCoord();
     const { createCountryFlatLine } = useCountry();
-    const { initCSS2DRender, create2DTag } = useCSS2DRender();
+    const { initCSS2DRender, create2DTag, create2DMark } = useCSS2DRender();
     const { createLightPillar, setLightPillarColor } = useMapMarkedLightPillar({
       scaleFactor: 3,
     });
@@ -749,6 +749,30 @@ export default {
       scene.fog = new THREE.Fog(0xffffff, 2, 90);
     };
 
+    // 初始化背景
+    const initSceneImag = (scene, url, size) => {
+      new THREE.TextureLoader().load(url, (texture) => {
+        const img = texture.image;
+        let height = (img && img.height) || 1080;
+        let width = (img && img.width) || 1920;
+        console.log("size", height, width); // 1080*1920
+        height = size * height;
+        width = size * width;
+        const mat = new THREE.MeshBasicMaterial({
+          map: texture,
+          // side: THREE.DoubleSide,
+          // transparent: true,
+        });
+        const geom = new THREE.PlaneGeometry(width, height);
+        const mesh = new THREE.Mesh(geom, mat);
+        mesh.position.set(...centerXY, bottomZ - 0.2);
+        mesh.position.y += 2.5;
+        mesh.position.x += 0.9;
+        scene.add(mesh);
+      });
+      scene.fog = new THREE.Fog(0xffffff, 2, 90);
+    };
+
     // 初始化中国轮廓地图
     const ChinaOutlineParams = {
       // 需要的参数
@@ -763,7 +787,7 @@ export default {
       currentPos2: 3600,
       pointSpeed: 10,
       // 追光控制
-      pointSize: 3.0,
+      pointSize: 3,
       pointColor: "#ffffff",
     };
     const initChinaOutline = async (scene) => {
@@ -801,6 +825,11 @@ export default {
           const [x, y] = row;
           // 创建三维点
           ChinaOutlineParams.lines.push([x, -y, 0]);
+          // 想增加点密度来实现更细腻的追光效果，但是效果不理想
+          ChinaOutlineParams.lines.push([x + 0.05, -y, 0]);
+          ChinaOutlineParams.lines.push([x - 0.05, -y, 0]);
+          // ChinaOutlineParams.lines.push([x + 0.12, -y, 0]);
+          // ChinaOutlineParams.lines.push([x - 0.12, -y, 0]);
         });
         indexBol = false;
       }
@@ -882,8 +911,8 @@ export default {
         vertexShader: vertexShader,
         fragmentShader: fragmentShader,
         transparent: true, // 设置透明
-        emissive: 0xff0000,
-        lending: THREE.AdditiveBlending, //在使用此材质显示对象时要使用何种混合。加法
+        // emissive: 0xff0000,
+        // lending: THREE.AdditiveBlending, //在使用此材质显示对象时要使用何种混合。加法
         uniforms: {
           uSize: {
             value: ChinaOutlineParams.pointSize,
@@ -899,7 +928,7 @@ export default {
       );
       scene.add(ChinaOutlineParams.points);
 
-      ChinaOutlineParams.points.position.set(0, 0, 1);
+      ChinaOutlineParams.points.position.set(0, 0, 1.01);
       ChinaOutlineParams.points.rotation.set(0, Math.PI, Math.PI);
       //UI设计  12秒1圈   长度大概是 64/360
       // 渲染
@@ -1069,6 +1098,22 @@ export default {
       );
     };
 
+    // 创建2D标点
+    const initMark = (properties, scene) => {
+      if (!properties.markSite) {
+        return false;
+      }
+      // 设置标签的显示内容和位置
+      const mark = create2DMark();
+      scene.add(mark);
+      let markCenter = properties.markSite;
+      mark.show(
+        "/assets/texture/旋转点位.webp",
+        new THREE.Vector3(...markCenter, extrudeSettings.depth + 0.3),
+        properties.markSize || 120
+      );
+    };
+
     onMounted(async () => {
       // 图表相关
       if (showCharts.value) {
@@ -1218,12 +1263,13 @@ export default {
               // 将每个省份的地图对象添加到总的地图组 mapGroup 中
               this.mapGroup.add(province);
               // 创建标点和标签
-              const curGroup = initLightPoint(currentConfig, this.mapGroup);
+              // const curGroup = initLightPoint(currentConfig, this.mapGroup);
               initLabel(currentConfig, this.scene);
+              initMark(currentConfig, this.scene);
               // console.log("elem", elem); {type: 'Feature', properties: {name:"北京市",adcode:11000,level: "province",center: [116.405285, 39.904989]}, geometry: {…}
-              if (elem.properties && elem.properties.level === "province") {
-                groupCodeMap[elem.properties.adcode] = curGroup;
-              }
+              // if (elem.properties && elem.properties.level === "province") {
+              //   groupCodeMap[elem.properties.adcode] = curGroup;
+              // }
             });
             // 创建上下边框
             initBorderLine(provinceData, this.mapGroup);
@@ -1248,7 +1294,8 @@ export default {
                 guiParams.showAperture;
 
             if (guiParams.showBackground) {
-              initSceneBg(this.scene, 40);
+              initSceneImag(this.scene, "/data/map/scene-bg2.png", 0.063);
+              // initSceneBg(this.scene, 40);
             }
             initChinaOutline(this.scene);
             console.log(ChinaOutlineParams);

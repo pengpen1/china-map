@@ -74,8 +74,56 @@ export default function useCSS2DRender() {
     };
     return label;
   };
+
+  /**
+   * 创建2d标记点
+   * @param {*} className 标记点class
+   * @returns
+   */
+  const create2DMark = (className = "") => {
+    const mark = document.createElement("div");
+    mark.className = className;
+    mark.style.pointerEvents = "none";
+    mark.style.visibility = "hidden";
+    mark.style.position = "absolute";
+    // 如果className不存在，用以下样式
+    // if (!className) {
+    // }
+    const markWrap = new CSS2DObject(mark);
+
+    /**
+     * 标记点显示，
+     * @param {*} url 标记点url
+     * @param {*} point 显示坐标
+     * @param {*} markSize 标记大小
+     */
+    markWrap.show = (url, point, markSize = 120) => {
+      const markItem = document.createElement("div");
+      markItem.style.backgroundImage = `url(${
+        url || "/assets/texture/旋转点位.webp"
+      })`;
+      markItem.style.backgroundSize = "100% 100%";
+      // markItem.style.backgroundImage = 'url("/assets/texture/标记.gif")';
+      markItem.style.width = markSize + "px";
+      markItem.style.height = markSize + "px";
+      // 将元素旋转到固定的方向
+      markItem.style.transform = "rotateX(10deg)";
+
+      markWrap.element.append(markItem);
+      markWrap.element.style.visibility = "visible";
+      markWrap.position.copy(point);
+    };
+    /**
+     * 隐藏
+     */
+    markWrap.hide = () => {
+      markWrap.element.style.visibility = "hidden";
+    };
+    return markWrap;
+  };
   return {
     initCSS2DRender,
     create2DTag,
+    create2DMark,
   };
 }

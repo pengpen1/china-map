@@ -17,6 +17,7 @@ export default function useMarkedLightPillar(options) {
   const { geoSphereCoord } = useCoord();
   // 默认参数
   let defaultOptions = {
+    // pointTextureUrl: "./assets/texture/旋转点位.webp",
     pointTextureUrl: "./assets/texture/标注.png",
     lightHaloTextureUrl: "./assets/texture/标注光圈.png",
     lightPillarUrl: "./assets/texture/光柱.png",
