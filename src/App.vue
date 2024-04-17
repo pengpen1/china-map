@@ -584,7 +584,7 @@ export default {
     const { requestData } = useFileLoader();
     const { transfromGeoJSON } = useConversionStandardData();
     const { getBoundingBox } = useCoord();
-    const { createCountryFlatLine } = useCountry();
+    const { createCountryFlatLine, createAreaLine } = useCountry();
     const { initCSS2DRender, create2DTag, create2DMark } = useCSS2DRender();
     const { createLightPillar, setLightPillarColor } = useMapMarkedLightPillar({
       scaleFactor: 3,
@@ -1046,6 +1046,18 @@ export default {
         data,
         {
           // color: 0xffffff,
+          color: 0x969ca2,
+          linewidth: 0.0008,
+          transparent: true,
+          depthTest: false,
+        },
+        "Line2"
+      );
+      // lineTop.position.z = extrudeSettings.depth;
+      lineTop.position.z += extrudeSettings.depth + 0.1;
+      let lineBottom = createCountryFlatLine(
+        data,
+        {
           color: 0xa9a7a7,
           linewidth: 0.001,
           transparent: true,
@@ -1053,22 +1065,28 @@ export default {
         },
         "Line2"
       );
-      // lineTop.position.z = extrudeSettings.depth;
-      lineTop.position.z += 0.305;
-      let lineBottom = createCountryFlatLine(
+      lineBottom.position.z = 0.305;
+      //  添加边线
+      mapGroup.add(lineTop);
+      console.log("大边线", lineTop);
+      // mapGroup.add(lineBottom);
+    };
+    // 创建顶部描边边线
+    const initStrokeLine = (data, mapGroup) => {
+      let lineTop = createAreaLine(
         data,
         {
-          color: 0x61fbfd,
-          linewidth: 0.002,
-          // transparent: true,
+          color: "#F0F8FF",
+          linewidth: 0.001,
+          transparent: true,
           depthTest: false,
         },
         "Line2"
       );
-      lineBottom.position.z -= 0.1905;
+      lineTop.position.z = extrudeSettings.depth + 0.65;
       //  添加边线
+      console.log("小边线", lineTop);
       mapGroup.add(lineTop);
-      mapGroup.add(lineBottom);
     };
     // 创建光柱
     const initLightPoint = (properties, mapGroup) => {
@@ -1237,6 +1255,8 @@ export default {
 
                   // 已上报的省份凸出来
                   if (currentConfig && currentConfig.reportStatus === 1) {
+                    initStrokeLine(polygon, province);
+
                     // 方案1 凹凸效果 缺点：没有更强烈的层次感
                     mesh.scale.set(1, 1, 1.5);
 

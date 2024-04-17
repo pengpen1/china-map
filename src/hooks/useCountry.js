@@ -57,6 +57,41 @@ const useCountryLine = () => {
     // 返回所有线条
     return lineGroup;
   };
+  const createAreaLine = (
+    polygon,
+    materialOptions = {},
+    lineType = "LineLoop"
+  ) => {
+    let materialOpt = {
+      color: 0x00ffff,
+    };
+    materialOpt = deepMerge(materialOpt, materialOptions);
+    let material = null;
+    if (lineType === "Line2") {
+      material = new LineMaterial(materialOpt);
+    } else {
+      material = new THREE.LineBasicMaterial(materialOpt);
+    }
+
+    let lineGroup = new THREE.Group();
+    const points = [];
+
+    for (let i = 0; i < polygon.length; i++) {
+      let [x, y] = polygon[i];
+      if (lineType === "Line2") {
+        points.push(x, y, 0);
+      } else {
+        points.push(new THREE.Vector3(x, y, 0));
+      }
+    }
+
+    // 根据每一块的点数据创建线条
+    let line = createLine(points, material, lineType);
+    // 将线条插入到组中
+    lineGroup.add(line);
+    // 返回所有线条
+    return lineGroup;
+  };
   /**
    * 根据点数据创建闭合的线条
    * @param {*} points 点数据
@@ -83,6 +118,7 @@ const useCountryLine = () => {
   };
   return {
     createCountryFlatLine,
+    createAreaLine,
   };
 };
 export default useCountryLine;
