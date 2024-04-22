@@ -758,7 +758,7 @@ export default {
         console.log("size", height, width); // 1080*1920
         height = size * height;
         width = size * width;
-        const mat = new THREE.MeshBasicMaterial({
+        const mat = new THREE.MeshStandardMaterial({
           map: texture,
           // side: THREE.DoubleSide,
           // transparent: true,
@@ -826,8 +826,8 @@ export default {
           // 创建三维点
           ChinaOutlineParams.lines.push([x, -y, 0]);
           // 想增加点密度来实现更细腻的追光效果，但是效果不理想
-          ChinaOutlineParams.lines.push([x + 0.05, -y, 0]);
-          ChinaOutlineParams.lines.push([x - 0.05, -y, 0]);
+          // ChinaOutlineParams.lines.push([x + 0.05, -y, 0]);
+          // ChinaOutlineParams.lines.push([x - 0.05, -y, 0]);
           // ChinaOutlineParams.lines.push([x + 0.12, -y, 0]);
           // ChinaOutlineParams.lines.push([x - 0.12, -y, 0]);
         });
@@ -1076,8 +1076,8 @@ export default {
       let lineTop = createAreaLine(
         data,
         {
-          color: "#F0F8FF",
-          linewidth: 0.001,
+          color: "#adf5ff",
+          linewidth: 0.0012,
           transparent: true,
           depthTest: false,
         },
@@ -1363,13 +1363,29 @@ export default {
           directionalLight2.position.set(...centerXY, 30);
           // 环境光
           let ambientLight = new THREE.AmbientLight(0x7af4ff, 1);
+          // 聚光灯,颜色，光照强度，光源照射的最大距离，光线照射范围的角度，聚光锥的半影衰减百分比，沿着光照距离的衰减量
+          let spotLight = new THREE.SpotLight(
+            0x1af0ff,
+            1.8,
+            200,
+            Math.PI / 3,
+            0,
+            2
+          );
+          spotLight.position.set(...centerXY, 25);
+          spotLight.target.position.set(...centerXY, 0); // 设置聚光灯的目标位置
+          this.addObject(spotLight.target); // 需要将目标的位置加入到场景中
+          spotLight.penumbra = 0.45; // 设置聚光灯的边缘模糊程度
+
           // 将光源添加到场景中
-          this.addObject(directionalLight1);
+          // this.addObject(directionalLight1);
           this.addObject(directionalLight2);
           this.addObject(ambientLight);
+          this.addObject(spotLight);
         }
         initRenderer() {
           super.initRenderer();
+          // this.renderer.autoClear = false;
           // this.renderer.outputEncoding = THREE.sRGBEncoding
 
           // {
@@ -1385,11 +1401,11 @@ export default {
           //     // 泛光的画布大小
           //     new THREE.Vector2(width, height),
           //     // 泛光效果的强度
-          //     0.8,
+          //     0.4,
           //     // 泛光效果的半径
-          //     5,
+          //     0.4,
           //     // 泛光效果的阈值
-          //     0.4
+          //     0.6
           //   );
           //   this.composer.addPass(bloomPass);
           // }
