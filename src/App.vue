@@ -95,6 +95,7 @@ import Map3d from "@/utils/Map3d.js";
 import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass";
 import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass";
 import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer";
+import { Reflector } from "three/examples/jsm/objects/Reflector.js";
 import TWEEN from "@tweenjs/tween.js";
 import gsap from "gsap";
 import * as THREE from "three";
@@ -761,14 +762,31 @@ export default {
         const mat = new THREE.MeshStandardMaterial({
           map: texture,
           // side: THREE.DoubleSide,
-          // transparent: true,
+          transparent: true,
+          opacity: 0.75,
         });
         const geom = new THREE.PlaneGeometry(width, height);
         const mesh = new THREE.Mesh(geom, mat);
-        mesh.position.set(...centerXY, bottomZ - 0.2);
+        mesh.position.set(...centerXY, bottomZ + 0.1);
         mesh.position.y += 2.5;
         mesh.position.x += 0.9;
+        // mesh.receiveShadow = true; // 设置接受阴影
         scene.add(mesh);
+
+        // 创建镜面
+        const mirrorOptions = {
+          clipBias: 0.03,
+          textureWidth: window.innerWidth * window.devicePixelRatio,
+          textureHeight: window.innerHeight * window.devicePixelRatio,
+          transparent: true,
+          opacity: 0.5,
+        };
+        const mirror = new Reflector(geom, mirrorOptions);
+        // mirror.receiveShadow = true; // 设置接受阴影
+        mirror.position.set(...centerXY, bottomZ - 0.2);
+        mirror.position.y += 2.5;
+        mirror.position.x += 0.9;
+        scene.add(mirror);
       });
       scene.fog = new THREE.Fog(0xffffff, 2, 90);
     };
