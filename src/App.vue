@@ -126,6 +126,450 @@ const ADCODE = [
     sideColor: "#4e8da2", // 侧边颜色
     markSize: 80,
   },
+  {
+    adcode: 500102,
+    name: "涪陵区",
+    center: [107.394905, 29.703652],
+    centroid: [107.334026, 29.658582],
+    markSite: [107.334026, 29.658582],
+    labelSite: [107.334026, 29.658582],
+    status: 0,
+    topColor: "#0f1214",
+    sideColor: "#4e8da2",
+    markSize: 80,
+  },
+  {
+    adcode: 500103,
+    name: "渝中区",
+    center: [106.56288, 29.556742],
+    centroid: [106.540387, 29.549305],
+    markSite: [106.540387, 29.549305],
+    labelSite: [106.540387, 29.549305],
+    status: 0,
+    topColor: "#0f1214",
+    sideColor: "#4e8da2",
+    markSize: 80,
+  },
+  {
+    adcode: 500104,
+    name: "大渡口区",
+    center: [106.48613, 29.481002],
+    centroid: [106.458637, 29.417574],
+    markSite: [106.458637, 29.417574],
+    labelSite: [106.458637, 29.417574],
+    status: 0,
+    topColor: "#0f1214",
+    sideColor: "#4e8da2",
+    markSize: 80,
+  },
+  {
+    adcode: 500105,
+    name: "江北区",
+    center: [106.532844, 29.575352],
+    centroid: [106.707043, 29.613282],
+    markSite: [106.707043, 29.613282],
+    labelSite: [106.707043, 29.613282],
+    status: 0,
+    topColor: "#0f1214",
+    sideColor: "#4e8da2",
+    markSize: 80,
+  },
+  {
+    adcode: 500106,
+    name: "沙坪坝区",
+    center: [106.4542, 29.541224],
+    centroid: [106.368248, 29.624462],
+    markSite: [106.368248, 29.624462],
+    labelSite: [106.368248, 29.624462],
+    status: 0,
+    topColor: "#0f1214",
+    sideColor: "#4e8da2",
+    markSize: 80,
+  },
+  {
+    adcode: 500107,
+    name: "九龙坡区",
+    center: [106.480989, 29.523492],
+    centroid: [106.364401, 29.428501],
+    markSite: [106.364401, 29.428501],
+    labelSite: [106.364401, 29.428501],
+    status: 0,
+    topColor: "#0f1214",
+    sideColor: "#4e8da2",
+    markSize: 80,
+  },
+  {
+    adcode: 500108,
+    name: "南岸区",
+    center: [106.560813, 29.523992],
+    centroid: [106.660614, 29.535521],
+    markSite: [106.660614, 29.535521],
+    labelSite: [106.660614, 29.535521],
+    status: 0,
+    topColor: "#0f1214",
+    sideColor: "#4e8da2",
+    markSize: 80,
+  },
+  {
+    adcode: 500109,
+    name: "北碚区",
+    center: [106.437868, 29.82543],
+    centroid: [106.513996, 29.861006],
+    markSite: [106.513996, 29.861006],
+    labelSite: [106.513996, 29.861006],
+    status: 0,
+    topColor: "#0f1214",
+    sideColor: "#4e8da2",
+    markSize: 80,
+  },
+  {
+    adcode: 500110,
+    name: "綦江区",
+    center: [106.651417, 29.028091],
+    centroid: [106.722706, 28.87864],
+    markSite: [106.722706, 28.87864],
+    labelSite: [106.722706, 28.87864],
+    status: 0,
+    topColor: "#0f1214",
+    sideColor: "#4e8da2",
+    markSize: 80,
+  },
+  {
+    adcode: 500111,
+    name: "大足区",
+    center: [105.715319, 29.700498],
+    centroid: [105.742721, 29.65],
+    markSite: [105.742721, 29.65],
+    labelSite: [105.742721, 29.65],
+    status: 0,
+    topColor: "#0f1214",
+    sideColor: "#4e8da2",
+    markSize: 80,
+  },
+  {
+    adcode: 500112,
+    name: "渝北区",
+    center: [106.512851, 29.601451],
+    centroid: [106.746928, 29.810209],
+    markSite: [106.746928, 29.810209],
+    labelSite: [106.746928, 29.810209],
+    status: 0,
+    topColor: "#0f1214",
+    sideColor: "#4e8da2",
+    markSize: 80,
+  },
+  {
+    adcode: 500113,
+    name: "巴南区",
+    center: [106.519423, 29.381919],
+    centroid: [106.751731, 29.371851],
+    markSite: [106.751731, 29.371851],
+    labelSite: [106.751731, 29.371851],
+    status: 0,
+    topColor: "#0f1214",
+    sideColor: "#4e8da2",
+    markSize: 80,
+  },
+  {
+    adcode: 500114,
+    name: "黔江区",
+    center: [108.782577, 29.527548],
+    centroid: [108.708597, 29.435532],
+    markSite: [108.708597, 29.435532],
+    labelSite: [108.708597, 29.435532],
+    status: 0,
+    topColor: "#0f1214",
+    sideColor: "#4e8da2",
+    markSize: 80,
+  },
+  {
+    adcode: 500115,
+    name: "长寿区",
+    center: [107.074854, 29.833671],
+    centroid: [107.140018, 29.954649],
+    markSite: [107.140018, 29.954649],
+    labelSite: [107.140018, 29.954649],
+    status: 0,
+    topColor: "#0f1214",
+    sideColor: "#4e8da2",
+    markSize: 80,
+  },
+  {
+    adcode: 500116,
+    name: "江津区",
+    center: [106.253156, 29.283387],
+    centroid: [106.263211, 29.029608],
+    markSite: [106.263211, 29.029608],
+    labelSite: [106.263211, 29.029608],
+    status: 0,
+    topColor: "#0f1214",
+    sideColor: "#4e8da2",
+    markSize: 80,
+  },
+  {
+    adcode: 500117,
+    name: "合川区",
+    center: [106.265554, 29.990993],
+    centroid: [106.311538, 30.112474],
+    markSite: [106.311538, 30.112474],
+    labelSite: [106.311538, 30.112474],
+    status: 0,
+    topColor: "#0f1214",
+    sideColor: "#4e8da2",
+    markSize: 80,
+  },
+  {
+    adcode: 500118,
+    name: "永川区",
+    center: [105.894714, 29.348748],
+    centroid: [105.872859, 29.290183],
+    markSite: [105.872859, 29.290183],
+    labelSite: [105.872859, 29.290183],
+    status: 0,
+    topColor: "#0f1214",
+    sideColor: "#4e8da2",
+    markSize: 80,
+  },
+  {
+    adcode: 500119,
+    name: "南川区",
+    center: [107.098153, 29.156646],
+    centroid: [107.171436, 29.13547],
+    markSite: [107.171436, 29.13547],
+    labelSite: [107.171436, 29.13547],
+    status: 0,
+    topColor: "#0f1214",
+    sideColor: "#4e8da2",
+    markSize: 80,
+  },
+  {
+    adcode: 500120,
+    name: "璧山区",
+    center: [106.231126, 29.593581],
+    centroid: [106.191948, 29.561371],
+    markSite: [106.191948, 29.561371],
+    labelSite: [106.191948, 29.561371],
+    status: 0,
+    topColor: "#0f1214",
+    sideColor: "#4e8da2",
+    markSize: 80,
+  },
+  {
+    adcode: 500151,
+    name: "铜梁区",
+    center: [106.054948, 29.839944],
+    centroid: [106.0332, 29.81109],
+    markSite: [106.0332, 29.81109],
+    labelSite: [106.0332, 29.81109],
+    status: 0,
+    topColor: "#0f1214",
+    sideColor: "#4e8da2",
+    markSize: 80,
+  },
+  {
+    adcode: 500152,
+    name: "潼南区",
+    center: [105.841818, 30.189554],
+    centroid: [105.814632, 30.143351],
+    markSite: [105.814632, 30.143351],
+    labelSite: [105.814632, 30.143351],
+    status: 0,
+    topColor: "#0f1214",
+    sideColor: "#4e8da2",
+    markSize: 80,
+  },
+  {
+    adcode: 500153,
+    name: "荣昌区",
+    center: [105.594061, 29.403627],
+    centroid: [105.506727, 29.464817],
+    markSite: [105.506727, 29.464817],
+    labelSite: [105.506727, 29.464817],
+    status: 0,
+    topColor: "#0f1214",
+    sideColor: "#4e8da2",
+    markSize: 80,
+  },
+  {
+    adcode: 500154,
+    name: "开州区",
+    center: [108.413317, 31.167735],
+    centroid: [108.382659, 31.271013],
+    markSite: [108.382659, 31.271013],
+    labelSite: [108.382659, 31.271013],
+    status: 0,
+    topColor: "#0f1214",
+    sideColor: "#4e8da2",
+    markSize: 80,
+  },
+  {
+    adcode: 500155,
+    name: "梁平区",
+    center: [107.800034, 30.672168],
+    centroid: [107.719234, 30.658344],
+    markSite: [107.719234, 30.658344],
+    labelSite: [107.719234, 30.658344],
+    status: 0,
+    topColor: "#0f1214",
+    sideColor: "#4e8da2",
+    markSize: 80,
+  },
+  {
+    adcode: 500156,
+    name: "武隆区",
+    center: [107.75655, 29.32376],
+    centroid: [107.709628, 29.373158],
+    markSite: [107.709628, 29.373158],
+    labelSite: [107.709628, 29.373158],
+    status: 0,
+    topColor: "#0f1214",
+    sideColor: "#4e8da2",
+    markSize: 80,
+  },
+  {
+    adcode: 500229,
+    name: "城口县",
+    center: [108.6649, 31.946293],
+    centroid: [108.735105, 31.881846],
+    markSite: [108.735105, 31.881846],
+    labelSite: [108.735105, 31.881846],
+    status: 0,
+    topColor: "#0f1214",
+    sideColor: "#4e8da2",
+    markSize: 80,
+  },
+  {
+    adcode: 500230,
+    name: "丰都县",
+    center: [107.73248, 29.866424],
+    centroid: [107.830885, 29.884753],
+    markSite: [107.830885, 29.884753],
+    labelSite: [107.830885, 29.884753],
+    status: 0,
+    topColor: "#0f1214",
+    sideColor: "#4e8da2",
+    markSize: 80,
+  },
+  {
+    adcode: 500231,
+    name: "垫江县",
+    center: [107.348692, 30.330012],
+    centroid: [107.437814, 30.253308],
+    markSite: [107.437814, 30.253308],
+    labelSite: [107.437814, 30.253308],
+    status: 0,
+    topColor: "#0f1214",
+    sideColor: "#4e8da2",
+    markSize: 80,
+  },
+  {
+    adcode: 500233,
+    name: "忠县",
+    center: [108.037518, 30.291537],
+    centroid: [107.914786, 30.335722],
+    markSite: [107.914786, 30.335722],
+    labelSite: [107.914786, 30.335722],
+    status: 0,
+    topColor: "#0f1214",
+    sideColor: "#4e8da2",
+    markSize: 80,
+  },
+  {
+    adcode: 500235,
+    name: "云阳县",
+    center: [108.697698, 30.930529],
+    centroid: [108.856912, 31.036349],
+    markSite: [108.856912, 31.036349],
+    labelSite: [108.856912, 31.036349],
+    status: 0,
+    topColor: "#0f1214",
+    sideColor: "#4e8da2",
+    markSize: 80,
+  },
+  {
+    adcode: 500236,
+    name: "奉节县",
+    center: [109.465774, 31.019967],
+    centroid: [109.349632, 30.952293],
+    markSite: [109.349632, 30.952293],
+    labelSite: [109.349632, 30.952293],
+    status: 0,
+    topColor: "#0f1214",
+    sideColor: "#4e8da2",
+    markSize: 80,
+  },
+  {
+    adcode: 500237,
+    name: "巫山县",
+    center: [109.878928, 31.074843],
+    centroid: [109.901246, 31.115189],
+    markSite: [109.901246, 31.115189],
+    labelSite: [109.901246, 31.115189],
+    status: 0,
+    topColor: "#0f1214",
+    sideColor: "#4e8da2",
+    markSize: 80,
+  },
+  {
+    adcode: 500238,
+    name: "巫溪县",
+    center: [109.628912, 31.3966],
+    centroid: [109.35337, 31.503107],
+    markSite: [109.35337, 31.503107],
+    labelSite: [109.35337, 31.503107],
+    status: 0,
+    topColor: "#0f1214",
+    sideColor: "#4e8da2",
+    markSize: 80,
+  },
+  {
+    adcode: 500240,
+    name: "石柱土家族",
+    center: [108.112448, 29.99853],
+    centroid: [108.298494, 30.093676],
+    markSite: [108.298494, 30.093676],
+    labelSite: [108.298494, 30.093676],
+    status: 0,
+    topColor: "#0f1214",
+    sideColor: "#4e8da2",
+    markSize: 80,
+  },
+  {
+    adcode: 500241,
+    name: "秀山土家族",
+    center: [108.996043, 28.444772],
+    centroid: [109.018121, 28.491722],
+    markSite: [109.018121, 28.491722],
+    labelSite: [109.018121, 28.491722],
+    status: 0,
+    topColor: "#0f1214",
+    sideColor: "#4e8da2",
+    markSize: 80,
+  },
+  {
+    adcode: 500242,
+    name: "酉阳土家族",
+    center: [108.767201, 28.839828],
+    centroid: [108.800321, 28.89987],
+    markSite: [108.800321, 28.89987],
+    labelSite: [108.800321, 28.89987],
+    status: 0,
+    topColor: "#0f1214",
+    sideColor: "#4e8da2",
+    markSize: 80,
+  },
+  {
+    adcode: 500243,
+    name: "彭水苗族",
+    center: [108.166551, 29.293856],
+    centroid: [108.266309, 29.353956],
+    markSite: [108.266309, 29.353956],
+    labelSite: [108.266309, 29.353956],
+    status: 0,
+    topColor: "#0f1214",
+    sideColor: "#4e8da2",
+    markSize: 80,
+  },
 ];
 const ADCODE_MAP = new Map();
 ADCODE.forEach((item) => {
@@ -212,9 +656,9 @@ export default {
       opacity: 1,
     });
     const sideMaterial = new THREE.MeshLambertMaterial({
-      color: 0x5d2618,
+      color: 0x528fa3,
       transparent: true,
-      opacity: 1,
+      opacity: 0.7,
     });
     const bottomZ = -0.2;
     // 初始化gui
@@ -236,7 +680,7 @@ export default {
           sideMaterial.color = new THREE.Color(val);
         }
       });
-      gui.add(guiParams, "sideOpacity", 0.1, 1, 0.01).onChange((val) => {
+      gui.add(guiParams, "sideOpacity", 0.1, 0.7, 0.01).onChange((val) => {
         if (topFaceMaterial) {
           sideMaterial.opacity = val;
         }
@@ -364,7 +808,7 @@ export default {
         polygon.forEach((row) => {
           const [x, y] = row;
           // 创建三维点
-          ChinaOutlineParams.lines.push([x, -y, 0]);
+          // ChinaOutlineParams.lines.push([x, -y, 0]);
           ChinaOutlineParams.Vector3Lines.push(
             new THREE.Vector3(...[x, -y, 0])
           );
@@ -378,18 +822,22 @@ export default {
       const feature = chinaData.features[0];
       // 点数据
       const coordinates = feature.geometry.coordinates;
-      coordinates.forEach((coordinate) => {
-        // coordinate 多边形数据
-        coordinate.forEach((rows) => {
-          lineDraw(rows, 0xe10909);
-        });
+      coordinates[0].forEach((rows) => {
+        lineDraw(rows);
       });
+      // 取第一个数组里面的数据即可
+      // coordinates.forEach((coordinate) => {
+      //   // coordinate 多边形数据
+      //   coordinate.forEach((rows) => {
+      //     lineDraw(rows);
+      //   });
+      // });
 
       // 顶部亮线条
       const topLineMaterial = new THREE.LineBasicMaterial({
-        color: 0x1af0ff, // 可以调整为动态变化的颜色
+        color: 0xffffff, // 可以调整为动态变化的颜色
         linewidth: 2, // 线宽
-        opacity: 0.8, // 透明度
+        opacity: 1, // 透明度
         transparent: true, // 使线段半透明
       });
       ChinaOutlineParams.topGeometry = new THREE.BufferGeometry().setFromPoints(
@@ -481,7 +929,7 @@ export default {
         ChinaOutlineParams.geometry,
         material
       );
-      scene.add(ChinaOutlineParams.points);
+      ChinaOutlineParams.points && scene.add(ChinaOutlineParams.points);
 
       ChinaOutlineParams.points.position.set(0, 0, extrudeSettings.depth / 2);
       ChinaOutlineParams.points.rotation.set(0, Math.PI, Math.PI);
@@ -490,6 +938,7 @@ export default {
       function render() {
         // console.log(ChinaOutlineParams.currentPos, ChinaOutlineParams.lines);
         if (
+          ChinaOutlineParams.lines.length &&
           ChinaOutlineParams.points &&
           ChinaOutlineParams.geometry.attributes.position
         ) {
@@ -511,23 +960,43 @@ export default {
         }
 
         if (ChinaOutlineParams.topGeometry) {
-          // 逐渐增加进度，控制线段的显现
-          ChinaOutlineParams.lineProgress += 0.005; // 每次帧增加进度，调整速度
+          // // 逐渐增加进度，控制线段的显现
+          // ChinaOutlineParams.lineProgress += 0.005; // 每次帧增加进度，调整速度
 
-          if (ChinaOutlineParams.lineProgress >= 0.99) {
-            ChinaOutlineParams.lineProgress = 0; // 重置进度，或者可以做其它逻辑
-          }
+          // if (ChinaOutlineParams.lineProgress >= 0.99) {
+          //   ChinaOutlineParams.lineProgress = 0; // 重置进度，或者可以做其它逻辑
+          // }
+
+          // // 计算当前应该显示到哪个点
+          // let currentPoints = [];
+          // let segmentCount = Math.floor(
+          //   ChinaOutlineParams.lineProgress *
+          //     ChinaOutlineParams.Vector3Lines.length
+          // ); // 当前绘制到第多少个点
+
+          // for (let i = 0; i < segmentCount; i++) {
+          //   currentPoints.push(ChinaOutlineParams.Vector3Lines[i]);
+          // }
+
+          // // 更新几何体的顶点数据
+          // ChinaOutlineParams.topGeometry.setFromPoints(currentPoints);
+
+          // 方案2.2
+          const segmentLength = 100; // 每次绘制500个点
 
           // 计算当前应该显示到哪个点
           let currentPoints = [];
-          let segmentCount = Math.floor(
-            ChinaOutlineParams.lineProgress *
-              ChinaOutlineParams.Vector3Lines.length
-          ); // 当前绘制到第多少个点
-
-          for (let i = 0; i < segmentCount; i++) {
-            currentPoints.push(ChinaOutlineParams.Vector3Lines[i]);
+          for (let i = 0; i < segmentLength; i++) {
+            // 计算索引，如果超过点集的长度则从前面取
+            let pointIndex =
+              (ChinaOutlineParams.lineProgress + i) %
+              ChinaOutlineParams.Vector3Lines.length;
+            currentPoints.push(ChinaOutlineParams.Vector3Lines[pointIndex]);
           }
+
+          ChinaOutlineParams.lineProgress =
+            (ChinaOutlineParams.lineProgress + 3) %
+            ChinaOutlineParams.Vector3Lines.length; // 每次更新时索引增加，超过点集长度则从0重新开始
 
           // 更新几何体的顶点数据
           ChinaOutlineParams.topGeometry.setFromPoints(currentPoints);
@@ -657,7 +1126,7 @@ export default {
       let labelCenter = properties.labelSite;
       label.show(
         properties.name,
-        new THREE.Vector3(...labelCenter, extrudeSettings.depth + 0.31)
+        new THREE.Vector3(...labelCenter, extrudeSettings.depth + 0.1)
       );
     };
 
@@ -846,7 +1315,7 @@ export default {
             0,
             2
           );
-          spotLight.position.set(...centerXY, 25);
+          spotLight.position.set(...centerXY, 20);
           spotLight.target.position.set(...centerXY, 0); // 设置聚光灯的目标位置
           this.addObject(spotLight.target); // 需要将目标的位置加入到场景中
           spotLight.penumbra = 0.45; // 设置聚光灯的边缘模糊程度
