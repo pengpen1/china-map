@@ -113,415 +113,17 @@ import useCSS2DRender from "@/hooks/useCSS2DRender";
 import leftBuiding from "./components/left/leftBuiding.vue";
 import rightBuiding from "./components/right/rightBuiding.vue";
 
-let centerXY = [104.114129, 7.550339]; // 地图的中心点，这个值会变更(取渲染出的3D地图的中心坐标)
-const COLOR_ARR = ["#0f1214", "#0d3854"]; // 测试颜色用的
+let centerXY = [14.114129, 7.550339]; // 地图的中心点，这个值会变更(取渲染出的3D地图的中心坐标)
 const ADCODE = [
   {
-    adcode: 110000,
-    name: "北京",
-    centroid: [116.41995, 40.18994],
-    markSite: [116.41995, 40.18994], //标记点位置
-    labelSite: [116.405285, 39.904989], //文本标签位置
-    reportStatus: 0, //未接入0，已上报1，未上报2
-    riskLevel: 0, //低危0，中危1，高危2
-    topColor: "#0f1214", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#0f1214，为1时颜色为#2890f0，为2时颜色为#0d3854
-    sideColor: "#4e8da2", //侧边颜色
-    markSize: 80,
-  },
-  {
-    adcode: 120000,
-    name: "天津",
-    centroid: [117.347043, 39.288036],
-    markSite: [117.347043, 39.288036], //标记点位置
-    labelSite: [117.190182, 39.125596], //文本标签位置
-    reportStatus: 0, //未接入0，已上报1，未上报2
-    riskLevel: 0, //低危0，中危1，高危2
-    topColor: "#0f1214", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#0f1214，为1时颜色为#2890f0，为2时颜色为#0d3854
-    sideColor: "#4e8da2", //侧边颜色
-    markSize: 80,
-  },
-  {
-    adcode: 130000,
-    name: "河北",
-    centroid: [114.502461, 38.045474],
-    markSite: [114.502461, 38.045474], //标记点位置
-    labelSite: [114.502461, 38.045474], //文本标签位置
-    reportStatus: 0, //未接入0，已上报1，未上报2
-    riskLevel: 0, //低危0，中危1，高危2
-    topColor: "#0f1214", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#0f1214，为1时颜色为#2890f0，为2时颜色为#0d3854
-    sideColor: "#4e8da2", //侧边颜色
-    markSize: 80,
-  },
-  {
-    adcode: 140000,
-    name: "山西",
-    centroid: [112.304436, 37.618179],
-    markSite: [112.304436, 37.618179], //标记点位置
-    labelSite: [112.549248, 37.857014], //文本标签位置
-    reportStatus: 0, //未接入0，已上报1，未上报2
-    riskLevel: 0, //低危0，中危1，高危2
-    topColor: "#0f1214", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#0f1214，为1时颜色为#2890f0，为2时颜色为#0d3854
-    sideColor: "#4e8da2", //侧边颜色
-    markSize: 80,
-  },
-  {
-    adcode: 150000,
-    name: "内蒙古",
-    centroid: [114.077429, 44.331087],
-    markSite: [114.077429, 44.331087], //标记点位置
-    labelSite: [111.670801, 40.818311], //文本标签位置
-    reportStatus: 2, //未接入0，已上报1，未上报2
-    riskLevel: 0, //低危0，中危1，高危2
-    topColor: "#0d3854", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#0f1214，为1时颜色为#2890f0，为2时颜色为#0d3854
-    sideColor: "#4e8da2", //侧边颜色
-    markSize: 80,
-  },
-  {
-    adcode: 210000,
-    name: "辽宁",
-    centroid: [122.604994, 41.299712],
-    markSite: [122.604994, 41.299712], //标记点位置
-    labelSite: [123.429096, 41.796767], //文本标签位置
-    reportStatus: 0, //未接入0，已上报1，未上报2
-    riskLevel: 0, //低危0，中危1，高危2
-    topColor: "#0f1214", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#0f1214，为1时颜色为#2890f0，为2时颜色为#0d3854
-    sideColor: "#4e8da2", //侧边颜色
-    markSize: 80,
-  },
-  {
-    adcode: 220000,
-    name: "吉林",
-    centroid: [126.171208, 43.703954],
-    markSite: [126.171208, 43.703954], //标记点位置
-    labelSite: [125.3245, 43.886841], //文本标签位置
-    reportStatus: 0, //未接入0，已上报1，未上报2
-    riskLevel: 0, //低危0，中危1，高危2
-    topColor: "#0f1214", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#0f1214，为1时颜色为#2890f0，为2时颜色为#0d3854
-    sideColor: "#4e8da2", //侧边颜色
-    markSize: 80,
-  },
-  {
-    adcode: 230000,
-    name: "黑龙江",
-    centroid: [127.693027, 48.040465],
-    markSite: [127.693027, 48.040465], //标记点位置
-    labelSite: [126.642464, 47], //文本标签位置
-    reportStatus: 1, //未接入0，已上报1，未上报2
-    riskLevel: 0, //低危0，中危1，高危2
-    topColor: "#2890f0", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#0f1214，为1时颜色为#2890f0，为2时颜色为#0d3854
-    sideColor: "#4e8da2", //侧边颜色
-    markSize: 100,
-  },
-  {
-    adcode: 310000,
-    name: "上海",
-    centroid: [121.438737, 31.072559],
-    markSite: [121.438737, 31.072559], //标记点位置
-    labelSite: [121.472644, 31.231706], //文本标签位置
-    reportStatus: 0, //未接入0，已上报1，未上报2
-    riskLevel: 0, //低危0，中危1，高危2
-    topColor: "#0f1214", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#0f1214，为1时颜色为#2890f0，为2时颜色为#0d3854
-    sideColor: "#4e8da2", //侧边颜色
-    markSize: 60,
-  },
-  {
-    adcode: 320000,
-    name: "江苏",
-    centroid: [119.486506, 32.983991],
-    markSite: [119.486506, 32.983991], //标记点位置
-    labelSite: [118.767413, 32.041544], //文本标签位置
-    reportStatus: 0, //未接入0，已上报1，未上报2
-    riskLevel: 0, //低危0，中危1，高危2
-    topColor: "#0f1214", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#0f1214，为1时颜色为#2890f0，为2时颜色为#0d3854
-    sideColor: "#4e8da2", //侧边颜色
-    markSize: 80,
-  },
-  {
-    adcode: 330000,
-    name: "浙江",
-    centroid: [120.109913, 29.181466],
-    markSite: [120.109913, 29.181466], //标记点位置
-    labelSite: [120.153576, 30.287459], //文本标签位置
-    reportStatus: 1, //未接入0，已上报1，未上报2
-    riskLevel: 0, //低危0，中危1，高危2
-    topColor: "#2890f0", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#0f1214，为1时颜色为#2890f0，为2时颜色为#0d3854
-    sideColor: "#4e8da2", //侧边颜色
-    markSize: 80,
-  },
-  {
-    adcode: 340000,
-    name: "安徽",
-    centroid: [117.226884, 31.849254],
-    markSite: [117.226884, 31.849254], //标记点位置
-    labelSite: [117.283042, 31.86119], //文本标签位置
-    reportStatus: 0, //未接入0，已上报1，未上报2
-    riskLevel: 0, //低危0，中危1，高危2
-    topColor: "#0f1214", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#0f1214，为1时颜色为#2890f0，为2时颜色为#0d3854
-    sideColor: "#4e8da2", //侧边颜色
-    markSize: 80,
-  },
-  {
-    adcode: 350000,
-    name: "福建",
-    centroid: [118.006468, 26.069925],
-    markSite: [118.006468, 26.069925], //标记点位置
-    labelSite: [119.306239, 26.075302], //文本标签位置
-    reportStatus: 0, //未接入0，已上报1，未上报2
-    riskLevel: 0, //低危0，中危1，高危2
-    topColor: "#0f1214", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#0f1214，为1时颜色为#2890f0，为2时颜色为#0d3854
-    sideColor: "#4e8da2", //侧边颜色
-    markSize: 80,
-  },
-  {
-    adcode: 360000,
-    name: "江西",
-    centroid: [115.732975, 27.636112],
-    markSite: [115.732975, 27.636112], //标记点位置
-    labelSite: [115.892151, 28.676493], //文本标签位置
-    reportStatus: 0, //未接入0，已上报1，未上报2
-    riskLevel: 0, //低危0，中危1，高危2
-    topColor: "#0f1214", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#0f1214，为1时颜色为#2890f0，为2时颜色为#0d3854
-    sideColor: "#4e8da2", //侧边颜色
-    markSize: 80,
-  },
-  {
-    adcode: 370000,
-    name: "山东",
-    centroid: [118.187759, 36.376092],
-    markSite: [118.187759, 36.376092], //标记点位置
-    labelSite: [117.000923, 36.675807], //文本标签位置
-    reportStatus: 0, //未接入0，已上报1，未上报2
-    riskLevel: 0, //低危0，中危1，高危2
-    topColor: "#0f1214", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#0f1214，为1时颜色为#2890f0，为2时颜色为#0d3854
-    sideColor: "#4e8da2", //侧边颜色
-    markSize: 80,
-  },
-  {
-    adcode: 410000,
-    name: "河南",
-    centroid: [113.619717, 33.902648],
-    markSite: [113.619717, 33.902648], //标记点位置
-    labelSite: [113.665412, 34.757975], //文本标签位置
-    reportStatus: 2, //未接入0，已上报1，未上报2
-    riskLevel: 0, //低危0，中危1，高危2
-    topColor: "#0d3854", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#0f1214，为1时颜色为#2890f0，为2时颜色为#0d3854
-    sideColor: "#4e8da2", //侧边颜色
-    markSize: 80,
-  },
-  {
-    adcode: 420000,
-    name: "湖北",
-    centroid: [112.271301, 30.987527],
-    markSite: [112.271301, 30.987527], //标记点位置
-    labelSite: [114.298572, 30.584355], //文本标签位置
-    reportStatus: 2, //未接入0，已上报1，未上报2
-    riskLevel: 0, //低危0，中危1，高危2
-    topColor: "#0d3854", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#0f1214，为1时颜色为#2890f0，为2时颜色为#0d3854
-    sideColor: "#4e8da2", //侧边颜色
-    markSize: 80,
-  },
-  {
-    adcode: 430000,
-    name: "湖南",
-    centroid: [111.711649, 27.629216],
-    markSite: [111.711649, 27.629216], //标记点位置
-    labelSite: [112.982279, 28.19409], //文本标签位置
-    reportStatus: 2, //未接入0，已上报1，未上报2
-    riskLevel: 0, //低危0，中危1，高危2
-    topColor: "#0d3854", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#0f1214，为1时颜色为#2890f0，为2时颜色为#0d3854
-    sideColor: "#4e8da2", //侧边颜色
-    markSize: 80,
-  },
-  {
-    adcode: 440000,
-    name: "广东",
-    centroid: [113.429919, 23.334643],
-    markSite: [113.429919, 23.334643], //标记点位置
-    labelSite: [113.280637, 24], //文本标签位置
-    reportStatus: 1, //未接入0，已上报1，未上报2
-    riskLevel: 0, //低危0，中危1，高危2
-    topColor: "#2890f0", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#0f1214，为1时颜色为#2890f0，为2时颜色为#0d3854
-    sideColor: "#4e8da2", //侧边颜色
-    markSize: 80,
-  },
-  {
-    adcode: 450000,
-    name: "广西",
-    centroid: [108.7944, 23.833381],
-    markSite: [108.7944, 23.833381], //标记点位置
-    labelSite: [108.320004, 22.82402], //文本标签位置
-    reportStatus: 2, //未接入0，已上报1，未上报2
-    riskLevel: 0, //低危0，中危1，高危2
-    topColor: "#0d3854", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#0f1214，为1时颜色为#2890f0，为2时颜色为#0d3854
-    sideColor: "#4e8da2", //侧边颜色
-    markSize: 80,
-  },
-  {
-    adcode: 460000,
-    name: "海南",
-    centroid: [109.754859, 19.189767],
-    markSite: [109.754859, 19.189767], //标记点位置
-    labelSite: [110.33119, 20.031971], //文本标签位置
-    reportStatus: 0, //未接入0，已上报1，未上报2
-    riskLevel: 0, //低危0，中危1，高危2
-    topColor: "#0f1214", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#0f1214，为1时颜色为#2890f0，为2时颜色为#0d3854
-    sideColor: "#4e8da2", //侧边颜色
-    markSize: 60,
-  },
-  {
-    adcode: 500000,
-    name: "重庆",
-    centroid: [107.8839, 30.067297],
-    markSite: [107.8839, 30.067297], //标记点位置
-    labelSite: [106.504962, 29.533155], //文本标签位置
-    reportStatus: 0, //未接入0，已上报1，未上报2
-    riskLevel: 0, //低危0，中危1，高危2
-    topColor: "#0f1214", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#0f1214，为1时颜色为#2890f0，为2时颜色为#0d3854
-    sideColor: "#4e8da2", //侧边颜色
-    markSize: 80,
-  },
-  {
-    adcode: 510000,
-    name: "四川",
-    centroid: [102.693453, 30.674545],
-    markSite: [102.693453, 30.674545], //标记点位置
-    labelSite: [104.065735, 30.659462], //文本标签位置
-    reportStatus: 0, //未接入0，已上报1，未上报2
-    riskLevel: 0, //低危0，中危1，高危2
-    topColor: "#0f1214", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#0f1214，为1时颜色为#2890f0，为2时颜色为#0d3854
-    sideColor: "#4e8da2", //侧边颜色
-    markSize: 80,
-  },
-  {
-    adcode: 520000,
-    name: "贵州",
-    centroid: [106.880455, 26.826368],
-    markSite: [106.880455, 26.826368], //标记点位置
-    labelSite: [106.713478, 26.578343], //文本标签位置
-    reportStatus: 2, //未接入0，已上报1，未上报2
-    riskLevel: 0, //低危0，中危1，高危2
-    topColor: "#0d3854", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#0f1214，为1时颜色为#2890f0，为2时颜色为#0d3854
-    sideColor: "#4e8da2", //侧边颜色
-    markSize: 80,
-  },
-  {
-    adcode: 530000,
-    name: "云南",
-    centroid: [101.485106, 25.008643],
-    markSite: [101.485106, 25.008643], //标记点位置
-    labelSite: [102.712251, 25.040609], //文本标签位置
-    reportStatus: 2, //未接入0，已上报1，未上报2
-    riskLevel: 0, //低危0，中危1，高危2
-    topColor: "#0d3854", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#0f1214，为1时颜色为#2890f0，为2时颜色为#0d3854
-    sideColor: "#4e8da2", //侧边颜色
-    markSize: 80,
-  },
-  {
-    adcode: 540000,
-    name: "西藏",
-    centroid: [88.388277, 31.56375],
-    markSite: [88.388277, 31.56375], //标记点位置
-    labelSite: [91.132212, 29.660361], //文本标签位置
-    reportStatus: 1, //未接入0，已上报1，未上报2
-    riskLevel: 1, //低危0，中危1，高危2
-    topColor: "#2890f0", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#0f1214，为1时颜色为#2890f0，为2时颜色为#0d3854
-    sideColor: "#4e8da2", //侧边颜色
-    markSize: 120,
-  },
-  {
-    adcode: 610000,
-    name: "陕西",
-    centroid: [108.887114, 35.263661],
-    markSite: [108.887114, 35.263661], //标记点位置
-    labelSite: [108.948024, 34.263161], //文本标签位置
-    reportStatus: 0, //未接入0，已上报1，未上报2
-    riskLevel: 0, //低危0，中危1，高危2
-    topColor: "#0f1214", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#0f1214，为1时颜色为#2890f0，为2时颜色为#0d3854
-    sideColor: "#4e8da2", //侧边颜色
-    markSize: 80,
-  },
-  {
-    adcode: 620000,
-    name: "甘肃",
-    centroid: [103.823557, 36.058039],
-    markSite: [103.823557, 36.058039], //标记点位置
-    labelSite: [103.823557, 36.058039], //文本标签位置
-    reportStatus: 1, //未接入0，已上报1，未上报2
-    riskLevel: 0, //低危0，中危1，高危2
-    topColor: "#2890f0", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#0f1214，为1时颜色为#2890f0，为2时颜色为#0d3854
-    sideColor: "#4e8da2", //侧边颜色
-    markSize: 80,
-  },
-  {
-    adcode: 630000,
-    name: "青海",
-    centroid: [96.043533, 35.726403],
-    markSite: [96.043533, 35.726403], //标记点位置
-    labelSite: [99, 36.623178], //文本标签位置
-    reportStatus: 0, //未接入0，已上报1，未上报2
-    riskLevel: 0, //低危0，中危1，高危2
-    topColor: "#0f1214", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#0f1214，为1时颜色为#2890f0，为2时颜色为#0d3854
-    sideColor: "#4e8da2", //侧边颜色
-    markSize: 100,
-  },
-  {
-    adcode: 640000,
-    name: "宁夏",
-    centroid: [106.169866, 37.291332],
-    markSite: [106.169866, 37.291332], //标记点位置
-    labelSite: [106.278179, 38.46637], //文本标签位置
-    reportStatus: 1, //未接入0，已上报1，未上报2
-    riskLevel: 0, //低危0，中危1，高危2
-    topColor: "#2890f0", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#0f1214，为1时颜色为#2890f0，为2时颜色为#0d3854
-    sideColor: "#4e8da2", //侧边颜色
-    markSize: 80,
-  },
-  {
-    adcode: 650000,
-    name: "新疆",
-    centroid: [85.294711, 41.371801],
-    markSite: [85.294711, 41.371801], //标记点位置
-    labelSite: [87.617733, 43.792818], //文本标签位置
-    reportStatus: 1, //未接入0，已上报1，未上报2
-    riskLevel: 2, //低危0，中危1，高危2
-    topColor: "#2890f0", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#0f1214，为1时颜色为#2890f0，为2时颜色为#0d3854
-    sideColor: "#4e8da2", //侧边颜色
-    markSize: 120,
-  },
-  {
-    adcode: 710000,
-    name: "台湾",
-    centroid: [120.971485, 23.749452],
-    markSite: [120.971485, 23.749452], //标记点位置
-    labelSite: [121.509062, 25.044332], //文本标签位置
-    reportStatus: 0, //未接入0，已上报1，未上报2
-    riskLevel: 0, //低危0，中危1，高危2
-    topColor: "#0f1214", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#0f1214，为1时颜色为#2890f0，为2时颜色为#0d3854
-    sideColor: "#4e8da2", //侧边颜色
-    markSize: 60,
-  },
-  {
-    adcode: 810000,
-    name: "香港",
-    centroid: [114.134357, 22.377366],
-    markSite: [114.134357, 22.377366], //标记点位置
-    labelSite: [114.5, 22.5], //文本标签位置
-    reportStatus: 0, //未接入0，已上报1，未上报2
-    riskLevel: 0, //低危0，中危1，高危2
-    topColor: "#0f1214", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#0f1214，为1时颜色为#2890f0，为2时颜色为#0d3854
-    sideColor: "#4e8da2", //侧边颜色
-    markSize: 80,
-  },
-  {
-    adcode: 820000,
-    name: "澳门",
-    centroid: [113.566988, 22.159307],
-    markSite: [113.566988, 22.159307], //标记点位置
-    labelSite: [112.5, 21.5], //文本标签位置
-    reportStatus: 0, //未接入0，已上报1，未上报2
-    riskLevel: 0, //低危0，中危1，高危2
-    topColor: "#0f1214", //顶部颜色,根据上报状态来定,上报状态值为0时顶部颜色值为#0f1214，为1时颜色为#2890f0，为2时颜色为#0d3854
-    sideColor: "#4e8da2", //侧边颜色
+    adcode: 500101,
+    name: "万州区",
+    centroid: [108.380246, 30.807807],
+    markSite: [108.406819, 30.704054], //标记点位置
+    labelSite: [108.406819, 30.704054], //文本标签位置
+    status: 0, // 预留
+    topColor: "#0f1214", // 顶部颜色
+    sideColor: "#4e8da2", // 侧边颜色
     markSize: 80,
   },
 ];
@@ -529,43 +131,6 @@ const ADCODE_MAP = new Map();
 ADCODE.forEach((item) => {
   ADCODE_MAP.set(item.adcode, item);
 });
-
-const adCodeMap = {
-  北京市: 110000,
-  天津市: 120000,
-  河北省: 130000,
-  山西省: 140000,
-  内蒙古自治区: 150000,
-  辽宁省: 210000,
-  吉林省: 220000,
-  黑龙江省: 230000,
-  上海市: 310000,
-  江苏省: 320000,
-  浙江省: 330000,
-  安徽省: 340000,
-  福建省: 350000,
-  江西省: 360000,
-  山东省: 370000,
-  河南省: 410000,
-  湖北省: 420000,
-  湖南省: 430000,
-  广东省: 440000,
-  广西壮族自治区: 450000,
-  海南省: 460000,
-  重庆市: 500000,
-  四川省: 510000,
-  贵州省: 520000,
-  云南省: 530000,
-  西藏自治区: 540000,
-  陕西省: 610000,
-  甘肃省: 620000,
-  青海省: 630000,
-  宁夏回族自治区: 640000,
-  新疆维吾尔自治区: 650000,
-  台湾省: 710000,
-  香港特别行政区: 810000,
-  澳门特别行政区: 820000,
-};
 
 export default {
   name: "3dMap30",
@@ -606,26 +171,25 @@ export default {
     textureMap.wrapT = texturefxMap.wrapT = THREE.RepeatWrapping;
     textureMap.flipY = texturefxMap.flipY = false;
     textureMap.rotation = texturefxMap.rotation = THREE.MathUtils.degToRad(45);
-    const scale = 0.0;
-    textureMap.repeat.set(scale, scale);
-    texturefxMap.repeat.set(scale, scale);
+    // const scale = 0.5;
+    // textureMap.repeat.set(scale, scale);
+    // texturefxMap.repeat.set(scale, scale);
 
-    const color = new THREE.Color("#29445d");
     // json数据中的code映射组
     let groupCodeMap = {};
     // 光标也可以针对单个省
     let lightGroup = null;
     const guiParams = {
       topColor: "#29445d",
-      topOpacity: 0.81,
+      topOpacity: 1,
       sideColor: "#4e8da2",
-      sideOpacity: 0.9,
+      sideOpacity: 1,
       // scale: 0.0,
       markColor: 0xe10909,
       showBackground: true,
       adcodeMap: 510000,
       showCharts: false,
-      showAperture: false,
+      showAperture: true,
       rotatingApertureMesh: null,
       rotatingPointMesh: null,
       circlePointMesh: null,
@@ -633,24 +197,24 @@ export default {
     let backgroundMesh = null;
     // 地图拉伸设置
     const extrudeSettings = {
-      depth: 1,
+      depth: 0.4,
       bevelEnabled: true,
       bevelSegments: 1,
       bevelThickness: 0.1,
     };
 
-    // 为已上报时-顶部和侧边材质
+    // 顶部和侧边材质
     const topFaceMaterial = new THREE.MeshPhongMaterial({
-      color: "#2890f0",
-      // emissive: color,
-      // combine: THREE.MultiplyOperation,
+      map: textureMap,
+      color: 0x6e6e6e,
+      combine: THREE.MultiplyOperation,
       transparent: true,
-      opacity: 0.81,
+      opacity: 1,
     });
     const sideMaterial = new THREE.MeshLambertMaterial({
-      color: "#4e8da2",
+      color: 0x5d2618,
       transparent: true,
-      opacity: 0.9,
+      opacity: 1,
     });
     const bottomZ = -0.2;
     // 初始化gui
@@ -676,19 +240,6 @@ export default {
         if (topFaceMaterial) {
           sideMaterial.opacity = val;
         }
-      });
-      gui.addColor(guiParams, "markColor").onChange((val) => {
-        console.log(val);
-        // setLightPillarColor(lightGroup, val);
-      });
-      // gui.add(guiParams, "scale", 0, 1).onChange((val) => {
-      //   textureMap.repeat.set(val, val);
-      //   texturefxMap.repeat.set(val, val);
-      // });
-      gui.add(guiParams, "adcodeMap", adCodeMap).onChange((val) => {
-        console.log(val); // 15000
-        console.log(groupCodeMap);
-        setLightPillarColor(groupCodeMap[val], guiParams.markColor);
       });
       gui.add(guiParams, "showBackground").onChange((val) => {
         backgroundMesh.visible = val;
@@ -747,7 +298,6 @@ export default {
       backgroundMesh = new THREE.Mesh(plane, material);
       backgroundMesh.position.set(...centerXY, bottomZ - 0.2);
       scene.add(backgroundMesh);
-      scene.fog = new THREE.Fog(0xffffff, 2, 90);
     };
 
     // 初始化背景
@@ -766,12 +316,12 @@ export default {
           opacity: 0.75,
         });
         const geom = new THREE.PlaneGeometry(width, height);
-        const mesh = new THREE.Mesh(geom, mat);
-        mesh.position.set(...centerXY, bottomZ + 0.1);
-        mesh.position.y += 2.5;
-        mesh.position.x += 0.9;
+        backgroundMesh = new THREE.Mesh(geom, mat);
+        backgroundMesh.position.set(...centerXY, bottomZ + 0.1);
+        backgroundMesh.position.y += 2.5;
+        backgroundMesh.position.x += 0.9;
         // mesh.receiveShadow = true; // 设置接受阴影
-        scene.add(mesh);
+        scene.add(backgroundMesh);
 
         // 创建镜面
         const mirrorOptions = {
@@ -788,12 +338,15 @@ export default {
         mirror.position.x += 0.9;
         scene.add(mirror);
       });
-      scene.fog = new THREE.Fog(0xffffff, 2, 90);
     };
 
     // 初始化中国轮廓地图
     const ChinaOutlineParams = {
-      // 需要的参数
+      // 描边方案2需要的参数
+      Vector3Lines: [],
+      lineProgress: 0,
+      topGeometry: null,
+      // 描边方案1需要的参数
       lines: [],
       positions: null,
       opacitys: null,
@@ -801,77 +354,61 @@ export default {
       geometry: null,
       // 速度控制
       currentPos: 0,
-      currentPos1: 1800,
-      currentPos2: 3600,
       pointSpeed: 10,
       // 追光控制
       pointSize: 3,
       pointColor: "#ffffff",
     };
     const initChinaOutline = async (scene) => {
-      let indexBol = true;
-
-      /**
-       * 边框 图形绘制
-       * @param polygon 多边形 点数组
-       * @param color 材质颜色
-       * */
-      // function lineDraw(polygon, color) {
-      //   const lineGeometry = new THREE.BufferGeometry();
-      //   const pointsArray = new Array();
-      //   polygon.forEach((row) => {
-      //     const [x, y] = row;
-      //     // 创建三维点
-      //     pointsArray.push(new THREE.Vector3(x, -y, 0));
-      //     console.log(indexBol);
-      //     if (indexBol) {
-      //       ChinaOutlineParams.lines.push([x, -y, 0]);
-      //     }
-      //   });
-      //   indexBol = false;
-      //   // 放入多个点
-      //   lineGeometry.setFromPoints(pointsArray);
-
-      //   const lineMaterial = new THREE.LineBasicMaterial({
-      //     color: color,
-      //   });
-      //   return new THREE.Line(lineGeometry, lineMaterial);
-      // }
-      // 只是要追光效果的话不需要画地图
       function lineDraw(polygon) {
         polygon.forEach((row) => {
           const [x, y] = row;
           // 创建三维点
           ChinaOutlineParams.lines.push([x, -y, 0]);
-          // 想增加点密度来实现更细腻的追光效果，但是效果不理想
-          // ChinaOutlineParams.lines.push([x + 0.05, -y, 0]);
-          // ChinaOutlineParams.lines.push([x - 0.05, -y, 0]);
-          // ChinaOutlineParams.lines.push([x + 0.12, -y, 0]);
-          // ChinaOutlineParams.lines.push([x - 0.12, -y, 0]);
+          ChinaOutlineParams.Vector3Lines.push(
+            new THREE.Vector3(...[x, -y, 0])
+          );
         });
-        indexBol = false;
       }
 
-      const chinaData = await requestData("./data/map/中国轮廓.json");
-      console.log("中国轮廓数据", chinaData);
+      const chinaData = await requestData("./data/map/重庆市轮廓.json");
+      console.log("重庆市轮廓", chinaData);
 
-      // 中国边界
+      // 边界
       const feature = chinaData.features[0];
-      // const province = new THREE.Object3D();
-      // province.properties = feature.properties.name;
       // 点数据
       const coordinates = feature.geometry.coordinates;
       coordinates.forEach((coordinate) => {
         // coordinate 多边形数据
         coordinate.forEach((rows) => {
-          const line = lineDraw(rows, 0xe10909);
-          // province.add(line);
+          lineDraw(rows, 0xe10909);
         });
       });
 
-      // province.position.set(0, 0, 2);
-      // province.rotation.set(0, Math.PI, Math.PI);
-      // scene.add(province);
+      // 顶部亮线条
+      const topLineMaterial = new THREE.LineBasicMaterial({
+        color: 0x1af0ff, // 可以调整为动态变化的颜色
+        linewidth: 2, // 线宽
+        opacity: 0.8, // 透明度
+        transparent: true, // 使线段半透明
+      });
+      ChinaOutlineParams.topGeometry = new THREE.BufferGeometry().setFromPoints(
+        ChinaOutlineParams.Vector3Lines
+      );
+
+      // 创建线条
+      ChinaOutlineParams.topLineMesh = new THREE.Line(
+        ChinaOutlineParams.topGeometry,
+        topLineMaterial
+      );
+      scene.add(ChinaOutlineParams.topLineMesh);
+
+      ChinaOutlineParams.topLineMesh.position.set(
+        0,
+        0,
+        (extrudeSettings.depth * 2) / 3
+      );
+      ChinaOutlineParams.topLineMesh.rotation.set(0, Math.PI, Math.PI);
 
       // 着色器相关
       ChinaOutlineParams.geometry = new THREE.BufferGeometry();
@@ -946,7 +483,7 @@ export default {
       );
       scene.add(ChinaOutlineParams.points);
 
-      ChinaOutlineParams.points.position.set(0, 0, 1.01);
+      ChinaOutlineParams.points.position.set(0, 0, extrudeSettings.depth / 2);
       ChinaOutlineParams.points.rotation.set(0, Math.PI, Math.PI);
       //UI设计  12秒1圈   长度大概是 64/360
       // 渲染
@@ -970,38 +507,32 @@ export default {
                 ChinaOutlineParams.lines.length
             ] = i / 50 > 2 ? 2 : i / 50;
           }
-
-          ChinaOutlineParams.currentPos1 += ChinaOutlineParams.pointSpeed;
-          for (let i = 0; i < ChinaOutlineParams.pointSpeed; i++) {
-            ChinaOutlineParams.opacitys[
-              (ChinaOutlineParams.currentPos1 - i) %
-                ChinaOutlineParams.lines.length
-            ] = 0;
-          }
-
-          for (let i = 0; i < 888; i++) {
-            ChinaOutlineParams.opacitys[
-              (ChinaOutlineParams.currentPos1 + i) %
-                ChinaOutlineParams.lines.length
-            ] = i / 50 > 2 ? 2 : i / 50;
-          }
-
-          ChinaOutlineParams.currentPos2 += ChinaOutlineParams.pointSpeed;
-          for (let i = 0; i < ChinaOutlineParams.pointSpeed; i++) {
-            ChinaOutlineParams.opacitys[
-              (ChinaOutlineParams.currentPos2 - i) %
-                ChinaOutlineParams.lines.length
-            ] = 0;
-          }
-
-          for (let i = 0; i < 300; i++) {
-            ChinaOutlineParams.opacitys[
-              (ChinaOutlineParams.currentPos2 + i) %
-                ChinaOutlineParams.lines.length
-            ] = i / 50 > 2 ? 2 : i / 50;
-          }
           ChinaOutlineParams.geometry.attributes.aOpacity.needsUpdate = true;
         }
+
+        if (ChinaOutlineParams.topGeometry) {
+          // 逐渐增加进度，控制线段的显现
+          ChinaOutlineParams.lineProgress += 0.005; // 每次帧增加进度，调整速度
+
+          if (ChinaOutlineParams.lineProgress >= 0.99) {
+            ChinaOutlineParams.lineProgress = 0; // 重置进度，或者可以做其它逻辑
+          }
+
+          // 计算当前应该显示到哪个点
+          let currentPoints = [];
+          let segmentCount = Math.floor(
+            ChinaOutlineParams.lineProgress *
+              ChinaOutlineParams.Vector3Lines.length
+          ); // 当前绘制到第多少个点
+
+          for (let i = 0; i < segmentCount; i++) {
+            currentPoints.push(ChinaOutlineParams.Vector3Lines[i]);
+          }
+
+          // 更新几何体的顶点数据
+          ChinaOutlineParams.topGeometry.setFromPoints(currentPoints);
+        }
+
         requestAnimationFrame(render);
       }
       requestAnimationFrame(render);
@@ -1014,12 +545,9 @@ export default {
         map: circlePoint,
         transparent: true,
         opacity: 1,
-        // depthTest: false,
       });
       let mesh = new THREE.Mesh(plane, material);
       mesh.position.set(...centerXY, bottomZ - 0.1);
-      // let mesh2 = mesh.clone()
-      // mesh2.position.set(...centerXY, bottomZ - 0.001)
       scene.add(mesh);
       return mesh;
     };
@@ -1071,7 +599,6 @@ export default {
         },
         "Line2"
       );
-      // lineTop.position.z = extrudeSettings.depth;
       lineTop.position.z += extrudeSettings.depth + 0.1;
       let lineBottom = createCountryFlatLine(
         data,
@@ -1157,9 +684,8 @@ export default {
         animation();
       }
 
-      // 中国地图数据
-      let provinceData = await requestData("./data/map/中华人民共和国.json");
-      // let provinceData = await requestData("./data/map/中国所有省.json");
+      // geo数据
+      let provinceData = await requestData("./data/map/重庆市.json");
       console.log("原始地图数据", provinceData);
       provinceData = transfromGeoJSON(provinceData);
 
@@ -1174,38 +700,23 @@ export default {
           this.camera = new THREE.PerspectiveCamera(45, rate, 0.001, 90000000);
           this.camera.up.set(0, 0, 1);
           // 中国地图
-          this.camera.position.set(102.49, 11.97, 42.95); //相机在Three.js坐标系中的位置
+          this.camera.position.set(102.49, 11.97, 22.95); //相机在Three.js坐标系中的位置
           this.camera.lookAt(...centerXY, 0);
         }
         // 使用 GSAP 控制相机位置变化
         startEntranceAnimation() {
-          // gsap.to(this.mapGroup.children, {
-          //   opacity: 1, // 目标透明度
-          //   duration: 2, // 动画持续时间
-          //   delay: 5, // 延迟一定时间后开始动画
-          //   // stagger: 0.1, // 每个元素动画之间的延迟时间
-          //   ease: "power2.inOut", // 缓动函数
-          // });
-
           const targetPosition = new THREE.Vector3(...centerXY, 0);
           // 使用 GSAP 控制相机位置变化
           gsap.to(this.camera.position, {
-            x: 105.54, // 相机目标 x 坐标
-            y: 21.36, // 相机目标 y 坐标
-            z: 52.69, // 相机目标 z 坐标
+            x: 107.71, // 相机目标 x 坐标
+            y: 28.8, // 相机目标 y 坐标
+            z: 7.12, // 相机目标 z 坐标
             delay: 0.3, // 延迟一定时间后开始动画
             duration: 2, // 动画持续时间
             ease: "power2.inOut", // 缓动函数
             onUpdate: () => {
               this.camera.lookAt(targetPosition);
             },
-          });
-
-          gsap.to(this.scene.fog, {
-            far: 1000,
-            duration: 2,
-            delay: 0.3,
-            ease: "power2.inOut", // 缓动函数
           });
         }
 
@@ -1217,7 +728,7 @@ export default {
             this.css2dRender = initCSS2DRender(this.options, this.container);
 
             provinceData.features.forEach((elem, index) => {
-              // 定一个省份对象
+              // 定一个省份 | 区对象
               const province = new THREE.Object3D();
               // 坐标
               const coordinates = elem.geometry.coordinates;
@@ -1230,6 +741,7 @@ export default {
               // 循环坐标
               coordinates.forEach((multiPolygon) => {
                 multiPolygon.forEach((polygon) => {
+                  // 省/区的轮廓线
                   const shape = new THREE.Shape();
                   // 绘制shape
                   for (let i = 0; i < polygon.length; i++) {
@@ -1244,77 +756,36 @@ export default {
                     extrudeSettings
                   );
 
-                  // const color = COLOR_ARR[Math.round(Math.random())]; // 测试颜色
-                  let curTopMaterial = null;
-                  let curSideMaterial = null;
-                  // 设置材质
-                  if (currentConfig && currentConfig.reportStatus !== 1) {
-                    curTopMaterial = new THREE.MeshPhongMaterial({
-                      color: currentConfig.topColor || "#0f1214",
-                      // emissive: color,
-                      // combine: THREE.MultiplyOperation,
-                      transparent: true,
-                      opacity: 0.81,
-                    });
-                    curSideMaterial = new THREE.MeshLambertMaterial({
-                      color: currentConfig.sideColor || "#8cb9e8",
-                      transparent: true,
-                      opacity: 0.9,
-                    });
-                  } else {
-                    curTopMaterial = topFaceMaterial;
-                    curSideMaterial = sideMaterial;
-                  }
-
                   const mesh = new THREE.Mesh(geometry, [
-                    curTopMaterial,
-                    curSideMaterial,
+                    topFaceMaterial,
+                    sideMaterial,
                   ]);
 
                   // 已上报的省份凸出来
-                  if (currentConfig && currentConfig.reportStatus === 1) {
+                  if (currentConfig && currentConfig.status === 1) {
                     initStrokeLine(polygon, province);
 
                     // 方案1 凹凸效果 缺点：没有更强烈的层次感
                     mesh.scale.set(1, 1, 1.5);
-
-                    // 方案2 在复制一个，修改材质
-                    // const mesh2 = new THREE.Mesh(geometry, [
-                    //   new THREE.MeshPhongMaterial({
-                    //     color: "#19647d",
-                    //     transparent: true,
-                    //     opacity: 0.75,
-                    //   }),
-                    //   new THREE.MeshLambertMaterial({
-                    //     color: "#061e27",
-                    //     transparent: true,
-                    //     opacity: 0.9,
-                    //   }),
-                    // ]);
-                    // mesh2.position.z = extrudeSettings.depth;
-                    // province.add(mesh2);
                   }
-                  // mesh.material.opacity = 0; // 初始透明度为 0，无效
+
                   province.add(mesh);
                 });
               });
-              // 将每个省份的地图对象添加到总的地图组 mapGroup 中
+
+              // 将每个省份 | 区的地图对象添加到总的地图组 mapGroup 中
               this.mapGroup.add(province);
               // 创建标点和标签
-              // const curGroup = initLightPoint(currentConfig, this.mapGroup);
               initLabel(currentConfig, this.scene);
-              initMark(currentConfig, this.scene);
-              // console.log("elem", elem); {type: 'Feature', properties: {name:"北京市",adcode:11000,level: "province",center: [116.405285, 39.904989]}, geometry: {…}
-              // if (elem.properties && elem.properties.level === "province") {
-              //   groupCodeMap[elem.properties.adcode] = curGroup;
-              // }
+              // initMark(currentConfig, this.scene);
             });
             // 创建上下边框
             initBorderLine(provinceData, this.mapGroup);
             console.log("this.mapGroup", this.mapGroup);
 
             let earthGroupBound = getBoundingBox(this.mapGroup);
-            centerXY = [earthGroupBound.center.x, earthGroupBound.center.y + 8];
+            centerXY = [earthGroupBound.center.x, earthGroupBound.center.y];
+            // centerXY = [107, 30];
             let { size } = earthGroupBound;
             let width = size.x < size.y ? size.y + 1 : size.x + 1;
             // 添加背景，修饰元素
@@ -1336,31 +807,16 @@ export default {
               // initSceneBg(this.scene, 40);
             }
             initChinaOutline(this.scene);
-            console.log(ChinaOutlineParams);
-
-            // // 创建发光材质
-            // const glowMaterial = new THREE.MeshBasicMaterial({
-            //   color: 0xffffff, // 设置颜色为白色
-            //   emissive: 0xffffff, // 设置发光颜色为白色
-            //   transparent: true, // 启用透明
-            //   opacity: 0.5, // 设置透明度
-            //   side: THREE.BackSide, // 设置材质的显示面为背面
-            // });
-
-            // // 创建发光的对象
-            // const glowGeometry = new THREE.TorusGeometry(10, 0.5, 16, 100); // 自定义形状，这里使用了环形
-            // const glowMesh = new THREE.Mesh(glowGeometry, glowMaterial);
-            // glowMesh.position.set(...centerXY, 1);
-            // this.scene.add(glowMesh);
+            // console.log(ChinaOutlineParams);
 
             // 将组添加到场景中
             this.scene.add(this.mapGroup);
             // this.particleArr = initParticle(this.scene, earthGroupBound);
             initGui();
-            setLightPillarColor(
-              groupCodeMap[guiParams.adcodeMap],
-              guiParams.markColor
-            );
+            // setLightPillarColor(
+            //   groupCodeMap[guiParams.adcodeMap],
+            //   guiParams.markColor
+            // );
           } catch (error) {
             console.log(error);
           }
@@ -1485,7 +941,7 @@ export default {
       }
       baseEarth = new CurrentMap3d({
         container: "#app-32-map",
-        axesVisibel: true,
+        axesVisibel: false,
         controls: {
           enableDamping: true, // 阻尼
           maxPolarAngle: (Math.PI / 2) * 0.98,
