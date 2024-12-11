@@ -95,6 +95,9 @@ import Map3d from "@/utils/Map3d.js";
 import { UnrealBloomPass } from "three/examples/jsm/postprocessing/UnrealBloomPass";
 import { RenderPass } from "three/examples/jsm/postprocessing/RenderPass";
 import { EffectComposer } from "three/examples/jsm/postprocessing/EffectComposer";
+import { Line2 } from "three/examples/jsm/lines/Line2.js";
+import { LineMaterial } from "three/examples/jsm/lines/LineMaterial.js";
+import { LineGeometry } from "three/examples/jsm/lines/LineGeometry.js";
 import { Reflector } from "three/examples/jsm/objects/Reflector.js";
 import TWEEN from "@tweenjs/tween.js";
 import gsap from "gsap";
@@ -585,6 +588,9 @@ export default {
   setup() {
     // 地图相关逻辑
     let baseEarth = null;
+    const raycaster = new THREE.Raycaster(); // 光线投射
+    const pointer = new THREE.Vector2();
+    let animationEnd = false;
 
     // 重置
     const resize = () => {
@@ -630,7 +636,7 @@ export default {
       sideOpacity: 1,
       // scale: 0.0,
       markColor: 0xe10909,
-      showBackground: true,
+      showBackground: false,
       adcodeMap: 510000,
       showCharts: false,
       showAperture: true,
@@ -647,19 +653,6 @@ export default {
       bevelThickness: 0.1,
     };
 
-    // 顶部和侧边材质
-    const topFaceMaterial = new THREE.MeshPhongMaterial({
-      map: textureMap,
-      color: 0x6e6e6e,
-      combine: THREE.MultiplyOperation,
-      transparent: true,
-      opacity: 1,
-    });
-    const sideMaterial = new THREE.MeshLambertMaterial({
-      color: 0x528fa3,
-      transparent: true,
-      opacity: 0.7,
-    });
     const bottomZ = -0.2;
     // 初始化gui
     const initGui = () => {
@@ -809,9 +802,7 @@ export default {
           const [x, y] = row;
           // 创建三维点
           // ChinaOutlineParams.lines.push([x, -y, 0]);
-          ChinaOutlineParams.Vector3Lines.push(
-            new THREE.Vector3(...[x, -y, 0])
-          );
+          ChinaOutlineParams.Vector3Lines.push(new THREE.Vector3(...[x, y, 0]));
         });
       }
 
@@ -836,27 +827,42 @@ export default {
       // 顶部亮线条
       const topLineMaterial = new THREE.LineBasicMaterial({
         color: 0xffffff, // 可以调整为动态变化的颜色
-        linewidth: 2, // 线宽
         opacity: 1, // 透明度
         transparent: true, // 使线段半透明
       });
       ChinaOutlineParams.topGeometry = new THREE.BufferGeometry().setFromPoints(
         ChinaOutlineParams.Vector3Lines
       );
-
-      // 创建线条
       ChinaOutlineParams.topLineMesh = new THREE.Line(
         ChinaOutlineParams.topGeometry,
         topLineMaterial
       );
+
+      // 方案2，线段，依然无法调整线宽，记得记录
+      // const topLineMaterial = new THREE.LineBasicMaterial({
+      //   color: 0xffffff, // 可以调整为动态变化的颜色
+      //   linewidth: 100, // 线宽 无法调整
+      //   opacity: 1, // 透明度
+      //   transparent: true, // 使线段半透明
+      // });
+      // ChinaOutlineParams.topGeometry = new THREE.BufferGeometry().setFromPoints(
+      //   ChinaOutlineParams.Vector3Lines
+      // );
+
+      // // 创建线条
+      // ChinaOutlineParams.topLineMesh = new THREE.LineSegments(
+      //   ChinaOutlineParams.topGeometry,
+      //   topLineMaterial
+      // );
+
       scene.add(ChinaOutlineParams.topLineMesh);
 
       ChinaOutlineParams.topLineMesh.position.set(
         0,
         0,
-        (extrudeSettings.depth * 2) / 3
+        extrudeSettings.depth + 0.1
+        // (extrudeSettings.depth * 2) / 3
       );
-      ChinaOutlineParams.topLineMesh.rotation.set(0, Math.PI, Math.PI);
 
       // 着色器相关
       ChinaOutlineParams.geometry = new THREE.BufferGeometry();
@@ -982,7 +988,7 @@ export default {
           // ChinaOutlineParams.topGeometry.setFromPoints(currentPoints);
 
           // 方案2.2
-          const segmentLength = 100; // 每次绘制500个点
+          const segmentLength = 200; // 每次绘制500个点
 
           // 计算当前应该显示到哪个点
           let currentPoints = [];
@@ -1020,41 +1026,7 @@ export default {
       scene.add(mesh);
       return mesh;
     };
-    // 初始化粒子
-    const initParticle = (scene, bound) => {
-      // 获取中心点和中间地图大小
-      let { center, size } = bound;
-      // 构建范围，中间地图的2倍
-      let minX = center.x - size.x;
-      let maxX = center.x + size.x;
-      let minY = center.y - size.y;
-      let maxY = center.y + size.y;
-      let minZ = -6;
-      let maxZ = 6;
 
-      let particleArr = [];
-      for (let i = 0; i < 16; i++) {
-        const particle = createSequenceFrame({
-          image: "./data/map/上升粒子1.png",
-          width: 180,
-          height: 189,
-          frame: 9,
-          column: 9,
-          row: 1,
-          speed: 0.5,
-        });
-        let particleScale = random(5, 10) / 1000;
-        particle.scale.set(particleScale, particleScale, particleScale);
-        particle.rotation.x = Math.PI / 2;
-        let x = random(minX, maxX);
-        let y = random(minY, maxY);
-        let z = random(minZ, maxZ);
-        particle.position.set(x, y, z);
-        particleArr.push(particle);
-      }
-      scene.add(...particleArr);
-      return particleArr;
-    };
     // 创建顶部底部边线
     const initBorderLine = (data, mapGroup) => {
       let lineTop = createCountryFlatLine(
@@ -1146,6 +1118,60 @@ export default {
       );
     };
 
+    function throttle(fn, delay) {
+      let lastTime = 0;
+
+      return function (...args) {
+        const now = Date.now();
+        if (now - lastTime >= delay) {
+          lastTime = now;
+          fn(...args);
+        }
+      };
+    }
+    // 鼠标移动监听
+    let meshs = null;
+    function onPointerMove(event, { renderer, camera }) {
+      // 获取 canvas 的边界矩形信息
+      const rect = renderer.domElement.getBoundingClientRect();
+
+      // 计算相对于 canvas 的归一化设备坐标，x 和 y 范围在 (-1, 1)
+      pointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+      pointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
+
+      // 通过摄像机和归一化的坐标更新射线，参数1是标准化设备坐标中鼠标的二维坐标 —— X分量与Y分量应当在-1到1之间，参数2射线所来源的摄像机
+      raycaster.setFromCamera(pointer, camera);
+
+      // 计算物体和射线的焦点，参数2递归若为true，则同时也会检测所有物体的后代。否则将只会检测对象本身的相交部分。默认值为true。
+      if (!meshs) {
+        meshs = ADCODE.map((item) => item.mesh);
+      }
+
+      const intersects = raycaster.intersectObjects(meshs, true);
+      if (intersects.length > 0) {
+        console.log(intersects);
+        // intersects.forEach((item) => {
+        //   item.object.material[0].color.set(0xff0000);
+        // });
+        const object = intersects[0].object;
+
+        if (object.adcode) {
+          ADCODE_MAP.get(object.adcode).topFaceMaterial.color.set(0xff0000);
+          ADCODE_MAP.get(object.adcode).sideMaterial.color.set(0xff0000);
+        } else {
+          if (Array.isArray(object.material)) {
+            object.material.forEach((m) => {
+              m.color.set(0xff0000);
+            });
+          } else {
+            object.material.color.set(0xff0000);
+          }
+        }
+      }
+    }
+
+    let pointerMoveHandler = null;
+
     onMounted(async () => {
       // 图表相关
       if (showCharts.value) {
@@ -1167,7 +1193,7 @@ export default {
           let rate = width / height;
           // 设置45°的透视相机,更符合人眼观察
           this.camera = new THREE.PerspectiveCamera(45, rate, 0.001, 90000000);
-          this.camera.up.set(0, 0, 1);
+          this.camera.up.set(0, 0, 1); // 设置相机上方向为z轴
           // 中国地图
           this.camera.position.set(102.49, 11.97, 22.95); //相机在Three.js坐标系中的位置
           this.camera.lookAt(...centerXY, 0);
@@ -1176,17 +1202,21 @@ export default {
         startEntranceAnimation() {
           const targetPosition = new THREE.Vector3(...centerXY, 0);
           // 使用 GSAP 控制相机位置变化
-          gsap.to(this.camera.position, {
-            x: 107.71, // 相机目标 x 坐标
-            y: 28.8, // 相机目标 y 坐标
-            z: 7.12, // 相机目标 z 坐标
-            delay: 0.3, // 延迟一定时间后开始动画
-            duration: 2, // 动画持续时间
-            ease: "power2.inOut", // 缓动函数
-            onUpdate: () => {
-              this.camera.lookAt(targetPosition);
-            },
-          });
+          gsap
+            .to(this.camera.position, {
+              x: 107.71, // 相机目标 x 坐标
+              y: 28.8, // 相机目标 y 坐标
+              z: 7.12, // 相机目标 z 坐标
+              delay: 0.3, // 延迟一定时间后开始动画
+              duration: 2, // 动画持续时间
+              ease: "power2.inOut", // 缓动函数
+              onUpdate: () => {
+                this.camera.lookAt(targetPosition);
+              },
+            })
+            .then(() => {
+              animationEnd = true;
+            });
         }
 
         initModel() {
@@ -1225,10 +1255,33 @@ export default {
                     extrudeSettings
                   );
 
+                  // 顶部和侧边材质,提出去就是控制所有,放里面可以单独设置
+                  const topFaceMaterial = new THREE.MeshPhongMaterial({
+                    map: textureMap,
+                    color: 0x6e6e6e,
+                    combine: THREE.MultiplyOperation,
+                    side: THREE.DoubleSide,
+                    transparent: true,
+                    opacity: 1,
+                  });
+                  const sideMaterial = new THREE.MeshLambertMaterial({
+                    color: 0x528fa3,
+                    transparent: true,
+                    side: THREE.DoubleSide,
+                    opacity: 0.7,
+                  });
+
                   const mesh = new THREE.Mesh(geometry, [
                     topFaceMaterial,
                     sideMaterial,
                   ]);
+                  mesh.adcode = properties.adcode;
+
+                  currentConfig.mesh = mesh;
+                  currentConfig.topFaceMaterial = topFaceMaterial;
+                  currentConfig.sideMaterial = sideMaterial;
+
+                  // 省份的轮廓线
 
                   // 已上报的省份凸出来
                   if (currentConfig && currentConfig.status === 1) {
@@ -1419,9 +1472,19 @@ export default {
       baseEarth.run();
       baseEarth.startEntranceAnimation();
       window.addEventListener("resize", resize);
+      pointerMoveHandler = throttle((event) => {
+        if (!animationEnd) return;
+        onPointerMove(event, {
+          renderer: baseEarth.renderer,
+          scene: baseEarth.scene,
+          camera: baseEarth.camera,
+        });
+      }, 100);
+      document.addEventListener("pointermove", pointerMoveHandler);
     });
     onBeforeUnmount(() => {
       window.removeEventListener("resize", resize);
+      document.removeEventListener("pointermove", pointerMoveHandler);
     });
 
     // 图表相关逻辑
