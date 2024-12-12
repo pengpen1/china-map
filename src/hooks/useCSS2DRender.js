@@ -121,9 +121,52 @@ export default function useCSS2DRender() {
     };
     return markWrap;
   };
+
+  /**
+   * 创建文本标签
+   * @param {*} text
+   * @param {*} position
+   * @returns
+   */
+  const createTextLabel = (text, position) => {
+    const div = document.createElement("div");
+    div.style.position = "absolute";
+    div.style.color = "white";
+    div.style.fontSize = "20px";
+    div.style.backgroundColor = "black";
+    div.style.padding = "10px";
+    div.style.borderRadius = "10px";
+    div.style.width = "200px";
+    div.style.textAlign = "center";
+    div.style.boxShadow = "0 0 10px rgba(0, 0, 0, 0.5)";
+    div.style.pointerEvents = "none"; // Prevents the label from interfering with mouse events
+
+    const textNode = document.createTextNode(text);
+    div.appendChild(textNode);
+
+    // Create the triangle
+    const triangle = document.createElement("div");
+    triangle.style.position = "absolute";
+    triangle.style.bottom = "-10px";
+    triangle.style.left = "50%";
+    triangle.style.transform = "translateX(-50%)";
+    triangle.style.width = "0px";
+    triangle.style.height = "0px";
+    triangle.style.borderLeft = "10px solid transparent";
+    triangle.style.borderRight = "10px solid transparent";
+    triangle.style.borderTop = "10px solid black";
+
+    div.appendChild(triangle);
+
+    const label = new CSS2DObject(div);
+    label.position.set(position.x, position.y, position.z);
+    return label;
+  };
+
   return {
     initCSS2DRender,
     create2DTag,
     create2DMark,
+    createTextLabel,
   };
 }

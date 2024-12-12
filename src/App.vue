@@ -588,8 +588,10 @@ export default {
   setup() {
     // 地图相关逻辑
     let baseEarth = null;
+    const temp = [];
     const raycaster = new THREE.Raycaster(); // 光线投射
     const pointer = new THREE.Vector2();
+    const clickPointer = new THREE.Vector2();
     let animationEnd = false;
 
     // 重置
@@ -601,7 +603,8 @@ export default {
     const { transfromGeoJSON } = useConversionStandardData();
     const { getBoundingBox } = useCoord();
     const { createCountryFlatLine, createAreaLine } = useCountry();
-    const { initCSS2DRender, create2DTag, create2DMark } = useCSS2DRender();
+    const { initCSS2DRender, create2DTag, create2DMark, createTextLabel } =
+      useCSS2DRender();
     const { createLightPillar, setLightPillarColor } = useMapMarkedLightPillar({
       scaleFactor: 3,
     });
@@ -630,7 +633,7 @@ export default {
     // 光标也可以针对单个省
     let lightGroup = null;
     const guiParams = {
-      topColor: "#29445d",
+      topColor: "#202826",
       topOpacity: 1,
       sideColor: "#4e8da2",
       sideOpacity: 1,
@@ -1118,6 +1121,36 @@ export default {
       );
     };
 
+    const destroyObject = (scene, object) => {
+      if (!object) {
+        return;
+      }
+      // 1. 从场景中移除物体
+      scene.remove(object);
+
+      // 2. 销毁物体的几何体
+      if (object.geometry) {
+        object.geometry.dispose();
+      }
+
+      // 3. 销毁物体的材质
+      if (object.material) {
+        if (Array.isArray(object.material)) {
+          // 如果有多个材质，则遍历销毁
+          object.material.forEach((material) => {
+            material.dispose();
+          });
+        } else {
+          // 单个材质
+          object.material.dispose();
+        }
+      }
+
+      // 4. 如果物体使用了纹理，销毁纹理
+      if (object.material && object.material.map) {
+        object.material.map.dispose();
+      }
+    };
     function throttle(fn, delay) {
       let lastTime = 0;
 
@@ -1131,7 +1164,8 @@ export default {
     }
     // 鼠标移动监听
     let meshs = null;
-    function onPointerMove(event, { renderer, camera }) {
+    let textLabel = null;
+    function onPointerMove(event, { renderer, camera, scene }) {
       // 获取 canvas 的边界矩形信息
       const rect = renderer.domElement.getBoundingClientRect();
 
@@ -1146,6 +1180,13 @@ export default {
       if (!meshs) {
         meshs = ADCODE.map((item) => item.mesh);
       }
+      ADCODE.forEach((item) => {
+        item.topFaceMaterial.color.set(0x202826);
+        item.sideMaterial.color.set(0x528fa3);
+      });
+      if (textLabel) {
+        destroyObject(scene, textLabel);
+      }
 
       const intersects = raycaster.intersectObjects(meshs, true);
       if (intersects.length > 0) {
@@ -1156,8 +1197,22 @@ export default {
         const object = intersects[0].object;
 
         if (object.adcode) {
-          ADCODE_MAP.get(object.adcode).topFaceMaterial.color.set(0xff0000);
-          ADCODE_MAP.get(object.adcode).sideMaterial.color.set(0xff0000);
+          const currentConfig = ADCODE_MAP.get(object.adcode);
+          currentConfig.topFaceMaterial.color.set(0x1aa3d1);
+          currentConfig.sideMaterial.color.set(0x1aa3d1);
+
+          // 在模型顶部显示文本标签
+          const textPosition = new THREE.Vector3(
+            currentConfig.labelSite[0],
+            currentConfig.labelSite[1],
+            extrudeSettings.depth + 1
+          );
+
+          textLabel = createTextLabel(
+            `${currentConfig.name}共计营业厅10（单击查看详情）`,
+            textPosition
+          );
+          scene.add(textLabel); // 将文本标签添加到场景中
         } else {
           if (Array.isArray(object.material)) {
             object.material.forEach((m) => {
@@ -1170,7 +1225,36 @@ export default {
       }
     }
 
+    function onPointerClick(event, { renderer, camera }) {
+      // 获取 canvas 的边界矩形信息
+      const rect = renderer.domElement.getBoundingClientRect();
+      let x = event.clientX;
+      let y = event.clientY;
+      // 计算相对于 canvas 的归一化设备坐标，x 和 y 范围在 (-1, 1)
+      clickPointer.x = (x / window.innerWidth) * 2 - 1;
+      clickPointer.y = -(y / window.innerHeight) * 2 + 1;
+
+      // 通过摄像机和归一化的坐标更新射线，参数1是标准化设备坐标中鼠标的二维坐标 —— X分量与Y分量应当在-1到1之间，参数2射线所来源的摄像机
+      raycaster.setFromCamera(clickPointer, camera);
+
+      // 计算物体和射线的焦点，参数2递归若为true，则同时也会检测所有物体的后代。否则将只会检测对象本身的相交部分。默认值为true。
+
+      const intersects = raycaster.intersectObjects(temp, true);
+      if (intersects.length > 0) {
+        console.log(intersects);
+        // intersects.forEach((item) => {
+        //   item.object.material[0].color.set(0xff0000);
+        // });
+        const object = intersects[0].object;
+
+        if (object.adcode) {
+          ADCODE_MAP.get(object.adcode).mesh.scale.set(1, 1, 1.2);
+        }
+      }
+    }
+
     let pointerMoveHandler = null;
+    let pointerClickHandler = null;
 
     onMounted(async () => {
       // 图表相关
@@ -1237,62 +1321,62 @@ export default {
               const currentConfig =
                 ADCODE_MAP.get(properties.adcode) || properties;
 
-              // 循环坐标
-              coordinates.forEach((multiPolygon) => {
-                multiPolygon.forEach((polygon) => {
-                  // 省/区的轮廓线
-                  const shape = new THREE.Shape();
-                  // 绘制shape
-                  for (let i = 0; i < polygon.length; i++) {
-                    let [x, y] = polygon[i];
-                    if (i === 0) {
-                      shape.moveTo(x, y);
-                    }
-                    shape.lineTo(x, y);
+              // 循环坐标 改成了取第一个大点位,,因为射线检测的时候，如果坐标点太多，会检测不到
+              // coordinates.forEach((multiPolygon) => {});
+              coordinates[0].forEach((polygon) => {
+                // 省/区的轮廓线
+                const shape = new THREE.Shape();
+                // 绘制shape
+                for (let i = 0; i < polygon.length; i++) {
+                  let [x, y] = polygon[i];
+                  if (i === 0) {
+                    shape.moveTo(x, y);
                   }
-                  const geometry = new THREE.ExtrudeGeometry(
-                    shape,
-                    extrudeSettings
-                  );
+                  shape.lineTo(x, y);
+                }
+                const geometry = new THREE.ExtrudeGeometry(
+                  shape,
+                  extrudeSettings
+                );
 
-                  // 顶部和侧边材质,提出去就是控制所有,放里面可以单独设置
-                  const topFaceMaterial = new THREE.MeshPhongMaterial({
-                    map: textureMap,
-                    color: 0x6e6e6e,
-                    combine: THREE.MultiplyOperation,
-                    side: THREE.DoubleSide,
-                    transparent: true,
-                    opacity: 1,
-                  });
-                  const sideMaterial = new THREE.MeshLambertMaterial({
-                    color: 0x528fa3,
-                    transparent: true,
-                    side: THREE.DoubleSide,
-                    opacity: 0.7,
-                  });
-
-                  const mesh = new THREE.Mesh(geometry, [
-                    topFaceMaterial,
-                    sideMaterial,
-                  ]);
-                  mesh.adcode = properties.adcode;
-
-                  currentConfig.mesh = mesh;
-                  currentConfig.topFaceMaterial = topFaceMaterial;
-                  currentConfig.sideMaterial = sideMaterial;
-
-                  // 省份的轮廓线
-
-                  // 已上报的省份凸出来
-                  if (currentConfig && currentConfig.status === 1) {
-                    initStrokeLine(polygon, province);
-
-                    // 方案1 凹凸效果 缺点：没有更强烈的层次感
-                    mesh.scale.set(1, 1, 1.5);
-                  }
-
-                  province.add(mesh);
+                // 顶部和侧边材质,提出去就是控制所有,放里面可以单独设置
+                const topFaceMaterial = new THREE.MeshPhongMaterial({
+                  map: textureMap,
+                  color: 0x202826,
+                  combine: THREE.MultiplyOperation,
+                  side: THREE.DoubleSide,
+                  transparent: true,
+                  opacity: 1,
                 });
+                const sideMaterial = new THREE.MeshLambertMaterial({
+                  color: 0x528fa3,
+                  transparent: true,
+                  side: THREE.DoubleSide,
+                  opacity: 0.7,
+                });
+
+                const mesh = new THREE.Mesh(geometry, [
+                  topFaceMaterial,
+                  sideMaterial,
+                ]);
+                temp.push(mesh);
+                mesh.adcode = properties.adcode;
+
+                currentConfig.mesh = mesh;
+                currentConfig.topFaceMaterial = topFaceMaterial;
+                currentConfig.sideMaterial = sideMaterial;
+
+                // 省份的轮廓线
+
+                // 已上报的省份凸出来
+                if (currentConfig && currentConfig.status === 1) {
+                  initStrokeLine(polygon, province);
+
+                  // 方案1 凹凸效果 缺点：没有更强烈的层次感
+                  mesh.scale.set(1, 1, 1.5);
+                }
+
+                province.add(mesh);
               });
 
               // 将每个省份 | 区的地图对象添加到总的地图组 mapGroup 中
@@ -1472,6 +1556,7 @@ export default {
       baseEarth.run();
       baseEarth.startEntranceAnimation();
       window.addEventListener("resize", resize);
+      // 移动事件
       pointerMoveHandler = throttle((event) => {
         if (!animationEnd) return;
         onPointerMove(event, {
@@ -1480,11 +1565,35 @@ export default {
           camera: baseEarth.camera,
         });
       }, 100);
-      document.addEventListener("pointermove", pointerMoveHandler);
+      baseEarth.renderer.domElement.addEventListener(
+        "pointermove",
+        pointerMoveHandler
+      );
+
+      // 点击事件
+      pointerClickHandler = (event) => {
+        if (!animationEnd) return;
+        onPointerClick(event, {
+          renderer: baseEarth.renderer,
+          scene: baseEarth.scene,
+          camera: baseEarth.camera,
+        });
+      };
+      baseEarth.renderer.domElement.addEventListener(
+        "click",
+        pointerClickHandler
+      );
     });
     onBeforeUnmount(() => {
       window.removeEventListener("resize", resize);
-      document.removeEventListener("pointermove", pointerMoveHandler);
+      baseEarth.renderer.domElement.removeEventListener(
+        "pointermove",
+        pointerMoveHandler
+      );
+      baseEarth.renderer.domElement.removeEventListener(
+        "click",
+        pointerClickHandler
+      );
     });
 
     // 图表相关逻辑
