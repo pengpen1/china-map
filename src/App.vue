@@ -117,6 +117,9 @@ import leftBuiding from "./components/left/leftBuiding.vue";
 import rightBuiding from "./components/right/rightBuiding.vue";
 
 let centerXY = [14.114129, 7.550339]; // 地图的中心点，这个值会变更(取渲染出的3D地图的中心坐标)
+let modelLevel = 1; // 地图级别 , 1:重庆市 2:区级
+let currentConfig = null; // 当前配置
+// 各区配置
 const ADCODE = [
   {
     adcode: 500101,
@@ -574,7 +577,7 @@ const ADCODE = [
     markSize: 80,
   },
 ];
-const ADCODE_MAP = new Map();
+const ADCODE_MAP = new Map(); // 配置map
 ADCODE.forEach((item) => {
   ADCODE_MAP.set(item.adcode, item);
 });
@@ -593,6 +596,7 @@ export default {
     const pointer = new THREE.Vector2();
     const clickPointer = new THREE.Vector2();
     let animationEnd = false;
+    let provinceData = null;
 
     // 重置
     const resize = () => {
@@ -694,7 +698,7 @@ export default {
       });
     };
     // 初始化旋转光圈
-    const initRotatingAperture = (scene, width) => {
+    const initRotatingAperture = (scene, width, mapGroup) => {
       let plane = new THREE.PlaneBufferGeometry(width, width);
       let material = new THREE.MeshBasicMaterial({
         map: rotatingApertureTexture,
@@ -706,10 +710,11 @@ export default {
       mesh.position.set(...centerXY, 0);
       mesh.scale.set(1.1, 1.1, 1.1);
       scene.add(mesh);
+      mapGroup.add(mesh);
       return mesh;
     };
-    // 初始化旋转点
-    const initRotatingPoint = (scene, width) => {
+    // 初始化旋转点(内圈那个)
+    const initRotatingPoint = (scene, width, mapGroup) => {
       let plane = new THREE.PlaneBufferGeometry(width, width);
       let material = new THREE.MeshBasicMaterial({
         map: rotatingPointTexture,
@@ -721,6 +726,7 @@ export default {
       mesh.position.set(...centerXY, bottomZ - 0.02);
       mesh.scale.set(1.1, 1.1, 1.1);
       scene.add(mesh);
+      mapGroup.add(mesh);
       return mesh;
     };
     // 初始化背景
@@ -799,25 +805,37 @@ export default {
       pointSize: 3,
       pointColor: "#ffffff",
     };
-    const initChinaOutline = async (scene) => {
-      function lineDraw(polygon) {
-        polygon.forEach((row) => {
-          const [x, y] = row;
-          // 创建三维点
-          // ChinaOutlineParams.lines.push([x, -y, 0]);
-          ChinaOutlineParams.Vector3Lines.push(new THREE.Vector3(...[x, y, 0]));
-        });
-      }
+    let contour = null;
+    function lineDraw(polygon, list) {
+      polygon.forEach((row) => {
+        const [x, y] = row;
+        // 创建三维点
+        list.push(new THREE.Vector3(...[x, y, 0]));
+      });
+    }
+    const initChinaOutline = async (scene, mapGroup) => {
+      ChinaOutlineParams.Vector3Lines = [];
+      ChinaOutlineParams.lineProgress = 0;
 
-      const chinaData = await requestData("./data/map/重庆市轮廓.json");
-      console.log("重庆市轮廓", chinaData);
+      let contourData = null;
+      if (modelLevel === 1) {
+        if (!contour) {
+          contourData = await requestData("./data/map/重庆市轮廓.json");
+        } else {
+          contourData = contour;
+        }
+      } else if (modelLevel === 2 && currentConfig) {
+        // geo数据
+        contourData = await getGeoJsonByCode(currentConfig.adcode);
+      }
+      console.log("contourData", contourData);
 
       // 边界
-      const feature = chinaData.features[0];
+      const feature = contourData.features[0];
       // 点数据
       const coordinates = feature.geometry.coordinates;
       coordinates[0].forEach((rows) => {
-        lineDraw(rows);
+        lineDraw(rows, ChinaOutlineParams.Vector3Lines);
       });
       // 取第一个数组里面的数据即可
       // coordinates.forEach((coordinate) => {
@@ -858,7 +876,8 @@ export default {
       //   topLineMaterial
       // );
 
-      scene.add(ChinaOutlineParams.topLineMesh);
+      // scene.add(ChinaOutlineParams.topLineMesh);
+      mapGroup.add(ChinaOutlineParams.topLineMesh);
 
       ChinaOutlineParams.topLineMesh.position.set(
         0,
@@ -866,157 +885,11 @@ export default {
         extrudeSettings.depth + 0.1
         // (extrudeSettings.depth * 2) / 3
       );
-
-      // 着色器相关
-      ChinaOutlineParams.geometry = new THREE.BufferGeometry();
-      ChinaOutlineParams.positions = new Float32Array(
-        ChinaOutlineParams.lines.flat(1)
-      );
-      // 设置顶点
-      ChinaOutlineParams.geometry.setAttribute(
-        "position",
-        new THREE.BufferAttribute(ChinaOutlineParams.positions, 3)
-      );
-      // 设置 粒子透明度为 0
-      ChinaOutlineParams.opacitys = new Float32Array(
-        ChinaOutlineParams.positions.length
-      ).map(() => 0);
-      ChinaOutlineParams.geometry.setAttribute(
-        "aOpacity",
-        new THREE.BufferAttribute(ChinaOutlineParams.opacitys, 1)
-      );
-
-      const vertexShader = `
-        attribute float aOpacity;
-        uniform float uSize;
-        varying float vOpacity;
-
-        void main(){
-            gl_Position = projectionMatrix*modelViewMatrix*vec4(position,1.0);
-            gl_PointSize = uSize;
-
-            vOpacity=aOpacity;
-        }
-        `;
-
-      const fragmentShader = `
-        varying float vOpacity;
-        uniform vec3 uColor;
-
-        float invert(float n){
-            return 1.-n;
-        }
-
-        void main(){
-          if(vOpacity <=0.2){
-              discard;
-          }
-          vec2 uv=vec2(gl_PointCoord.x,invert(gl_PointCoord.y));
-          vec2 cUv=2.*uv-1.;
-          vec4 color=vec4(1./length(cUv));
-          color*=vOpacity;
-          color.rgb*=uColor;
-          gl_FragColor=color;
-        }
-        `;
-      const material = new THREE.ShaderMaterial({
-        vertexShader: vertexShader,
-        fragmentShader: fragmentShader,
-        transparent: true, // 设置透明
-        // emissive: 0xff0000,
-        // lending: THREE.AdditiveBlending, //在使用此材质显示对象时要使用何种混合。加法
-        uniforms: {
-          uSize: {
-            value: ChinaOutlineParams.pointSize,
-          },
-          uColor: {
-            value: new THREE.Color(ChinaOutlineParams.pointColor),
-          },
-        },
-      });
-      ChinaOutlineParams.points = new THREE.Points(
-        ChinaOutlineParams.geometry,
-        material
-      );
-      ChinaOutlineParams.points && scene.add(ChinaOutlineParams.points);
-
-      ChinaOutlineParams.points.position.set(0, 0, extrudeSettings.depth / 2);
-      ChinaOutlineParams.points.rotation.set(0, Math.PI, Math.PI);
-      //UI设计  12秒1圈   长度大概是 64/360
-      // 渲染
-      function render() {
-        // console.log(ChinaOutlineParams.currentPos, ChinaOutlineParams.lines);
-        if (
-          ChinaOutlineParams.lines.length &&
-          ChinaOutlineParams.points &&
-          ChinaOutlineParams.geometry.attributes.position
-        ) {
-          ChinaOutlineParams.currentPos += ChinaOutlineParams.pointSpeed;
-          for (let i = 0; i < ChinaOutlineParams.pointSpeed; i++) {
-            ChinaOutlineParams.opacitys[
-              (ChinaOutlineParams.currentPos - i) %
-                ChinaOutlineParams.lines.length
-            ] = 0;
-          }
-
-          for (let i = 0; i < 888; i++) {
-            ChinaOutlineParams.opacitys[
-              (ChinaOutlineParams.currentPos + i) %
-                ChinaOutlineParams.lines.length
-            ] = i / 50 > 2 ? 2 : i / 50;
-          }
-          ChinaOutlineParams.geometry.attributes.aOpacity.needsUpdate = true;
-        }
-
-        if (ChinaOutlineParams.topGeometry) {
-          // // 逐渐增加进度，控制线段的显现
-          // ChinaOutlineParams.lineProgress += 0.005; // 每次帧增加进度，调整速度
-
-          // if (ChinaOutlineParams.lineProgress >= 0.99) {
-          //   ChinaOutlineParams.lineProgress = 0; // 重置进度，或者可以做其它逻辑
-          // }
-
-          // // 计算当前应该显示到哪个点
-          // let currentPoints = [];
-          // let segmentCount = Math.floor(
-          //   ChinaOutlineParams.lineProgress *
-          //     ChinaOutlineParams.Vector3Lines.length
-          // ); // 当前绘制到第多少个点
-
-          // for (let i = 0; i < segmentCount; i++) {
-          //   currentPoints.push(ChinaOutlineParams.Vector3Lines[i]);
-          // }
-
-          // // 更新几何体的顶点数据
-          // ChinaOutlineParams.topGeometry.setFromPoints(currentPoints);
-
-          // 方案2.2
-          const segmentLength = 200; // 每次绘制500个点
-
-          // 计算当前应该显示到哪个点
-          let currentPoints = [];
-          for (let i = 0; i < segmentLength; i++) {
-            // 计算索引，如果超过点集的长度则从前面取
-            let pointIndex =
-              (ChinaOutlineParams.lineProgress + i) %
-              ChinaOutlineParams.Vector3Lines.length;
-            currentPoints.push(ChinaOutlineParams.Vector3Lines[pointIndex]);
-          }
-
-          ChinaOutlineParams.lineProgress =
-            (ChinaOutlineParams.lineProgress + 3) %
-            ChinaOutlineParams.Vector3Lines.length; // 每次更新时索引增加，超过点集长度则从0重新开始
-
-          // 更新几何体的顶点数据
-          ChinaOutlineParams.topGeometry.setFromPoints(currentPoints);
-        }
-
-        requestAnimationFrame(render);
-      }
-      requestAnimationFrame(render);
+      // 下一次重绘之前调用，如果就放在这的话，会一直调用，导致速度越来越快
+      // requestAnimationFrame(render);
     };
     // 初始化原点
-    const initCirclePoint = (scene, width) => {
+    const initCirclePoint = (scene, width, mapGroup) => {
       let plane = new THREE.PlaneBufferGeometry(width, width);
       let material = new THREE.MeshPhongMaterial({
         color: 0x00ffff,
@@ -1027,6 +900,7 @@ export default {
       let mesh = new THREE.Mesh(plane, material);
       mesh.position.set(...centerXY, bottomZ - 0.1);
       scene.add(mesh);
+      mapGroup.add(mesh);
       return mesh;
     };
 
@@ -1091,13 +965,14 @@ export default {
       return lightGroup;
     };
     // 创建标签
-    const initLabel = (properties, scene) => {
+    const initLabel = (properties, scene, mapGroup) => {
       if (!properties.labelSite) {
         return false;
       }
       // 设置标签的显示内容和位置
       var label = create2DTag("标签", "map-32-label");
       scene.add(label);
+      mapGroup.add(label);
       let labelCenter = properties.labelSite;
       label.show(
         properties.name,
@@ -1119,6 +994,18 @@ export default {
         new THREE.Vector3(...markCenter, extrudeSettings.depth + 0.3),
         properties.markSize || 120
       );
+    };
+
+    const getGeoJsonByCode = async (adcode) => {
+      // 包一层是纯属是懒得做判断
+      return {
+        features: [
+          provinceData.features.find(
+            (item) => item.properties.adcode === Number(adcode)
+          ),
+        ],
+        type: "FeatureCollection",
+      };
     };
 
     const destroyObject = (scene, object) => {
@@ -1163,7 +1050,6 @@ export default {
       };
     }
     // 鼠标移动监听
-    let meshs = null;
     let textLabel = null;
     function onPointerMove(event, { renderer, camera, scene }) {
       // 获取 canvas 的边界矩形信息
@@ -1177,9 +1063,6 @@ export default {
       raycaster.setFromCamera(pointer, camera);
 
       // 计算物体和射线的焦点，参数2递归若为true，则同时也会检测所有物体的后代。否则将只会检测对象本身的相交部分。默认值为true。
-      if (!meshs) {
-        meshs = ADCODE.map((item) => item.mesh);
-      }
       ADCODE.forEach((item) => {
         item.topFaceMaterial.color.set(0x202826);
         item.sideMaterial.color.set(0x528fa3);
@@ -1188,7 +1071,7 @@ export default {
         destroyObject(scene, textLabel);
       }
 
-      const intersects = raycaster.intersectObjects(meshs, true);
+      const intersects = raycaster.intersectObjects(temp, true);
       if (intersects.length > 0) {
         console.log(intersects);
         // intersects.forEach((item) => {
@@ -1198,21 +1081,24 @@ export default {
 
         if (object.adcode) {
           const currentConfig = ADCODE_MAP.get(object.adcode);
-          currentConfig.topFaceMaterial.color.set(0x1aa3d1);
-          currentConfig.sideMaterial.color.set(0x1aa3d1);
 
-          // 在模型顶部显示文本标签
-          const textPosition = new THREE.Vector3(
-            currentConfig.labelSite[0],
-            currentConfig.labelSite[1],
-            extrudeSettings.depth + 1
-          );
+          if (modelLevel === 1) {
+            currentConfig.topFaceMaterial.color.set(0x1aa3d1);
+            currentConfig.sideMaterial.color.set(0x1aa3d1);
 
-          textLabel = createTextLabel(
-            `${currentConfig.name}共计营业厅10（单击查看详情）`,
-            textPosition
-          );
-          scene.add(textLabel); // 将文本标签添加到场景中
+            // 在模型顶部显示文本标签
+            const textPosition = new THREE.Vector3(
+              currentConfig.labelSite[0],
+              currentConfig.labelSite[1],
+              extrudeSettings.depth + 1
+            );
+
+            textLabel = createTextLabel(
+              `${currentConfig.name}共计营业厅10（单击查看详情）`,
+              textPosition
+            );
+            scene.add(textLabel); // 将文本标签添加到场景中
+          }
         } else {
           if (Array.isArray(object.material)) {
             object.material.forEach((m) => {
@@ -1225,14 +1111,12 @@ export default {
       }
     }
 
-    function onPointerClick(event, { renderer, camera }) {
+    async function onPointerClick(event, { renderer, camera }) {
       // 获取 canvas 的边界矩形信息
       const rect = renderer.domElement.getBoundingClientRect();
-      let x = event.clientX;
-      let y = event.clientY;
       // 计算相对于 canvas 的归一化设备坐标，x 和 y 范围在 (-1, 1)
-      clickPointer.x = (x / window.innerWidth) * 2 - 1;
-      clickPointer.y = -(y / window.innerHeight) * 2 + 1;
+      clickPointer.x = ((event.clientX - rect.left) / rect.width) * 2 - 1;
+      clickPointer.y = -((event.clientY - rect.top) / rect.height) * 2 + 1;
 
       // 通过摄像机和归一化的坐标更新射线，参数1是标准化设备坐标中鼠标的二维坐标 —— X分量与Y分量应当在-1到1之间，参数2射线所来源的摄像机
       raycaster.setFromCamera(clickPointer, camera);
@@ -1248,13 +1132,27 @@ export default {
         const object = intersects[0].object;
 
         if (object.adcode) {
-          ADCODE_MAP.get(object.adcode).mesh.scale.set(1, 1, 1.2);
+          currentConfig = ADCODE_MAP.get(object.adcode);
+          modelLevel = 2;
+          baseEarth.destroy();
+          await baseEarth.initModel();
+          baseEarth.startEntranceAnimation();
+          // ADCODE_MAP.get(object.adcode).mesh.scale.set(1, 1, 1.2);
         }
       }
     }
 
+    async function onRightClick(event, { renderer, camera }) {
+      currentConfig = null;
+      modelLevel = 1;
+      baseEarth.destroy();
+      await baseEarth.initModel();
+      baseEarth.startEntranceAnimation();
+    }
+
     let pointerMoveHandler = null;
     let pointerClickHandler = null;
+    let rightClickHandler = null;
 
     onMounted(async () => {
       // 图表相关
@@ -1264,7 +1162,7 @@ export default {
       }
 
       // geo数据
-      let provinceData = await requestData("./data/map/重庆市.json");
+      provinceData = await requestData("./data/map/重庆市.json");
       console.log("原始地图数据", provinceData);
       provinceData = transfromGeoJSON(provinceData);
 
@@ -1284,33 +1182,74 @@ export default {
         }
         // 使用 GSAP 控制相机位置变化
         startEntranceAnimation() {
-          const targetPosition = new THREE.Vector3(...centerXY, 0);
-          // 使用 GSAP 控制相机位置变化
-          gsap
-            .to(this.camera.position, {
-              x: 107.71, // 相机目标 x 坐标
-              y: 28.8, // 相机目标 y 坐标
-              z: 7.12, // 相机目标 z 坐标
-              delay: 0.3, // 延迟一定时间后开始动画
-              duration: 2, // 动画持续时间
-              ease: "power2.inOut", // 缓动函数
-              onUpdate: () => {
-                this.camera.lookAt(targetPosition);
-              },
-            })
-            .then(() => {
-              animationEnd = true;
-            });
+          animationEnd = false;
+          const targetLookAt = new THREE.Vector3(...centerXY, 0);
+          let newTargetLookAt = null;
+          const target = {
+            x: 107.71,
+            y: 28.8,
+            z: 7.12,
+          };
+          if (modelLevel === 2) {
+            target.x = 107.18;
+            target.y = 29.33;
+            target.z = 1.73;
+            if (currentConfig) {
+              newTargetLookAt = new THREE.Vector3(...currentConfig.cameraSite);
+              gsap
+                .to(this.camera.position, {
+                  x: target.x, // 相机目标 x 坐标
+                  y: target.y, // 相机目标 y 坐标
+                  z: target.z, // 相机目标 z 坐标
+                  delay: 0.3, // 延迟一定时间后开始动画
+                  duration: 2, // 动画持续时间
+                  ease: "power2.inOut", // 缓动函数
+                  onUpdate: () => {
+                    this.camera.lookAt(newTargetLookAt);
+                  },
+                })
+                .then(() => {
+                  animationEnd = true;
+                });
+            }
+          } else {
+            // 使用 GSAP 控制相机位置变化
+            gsap
+              .to(this.camera.position, {
+                x: target.x, // 相机目标 x 坐标
+                y: target.y, // 相机目标 y 坐标
+                z: target.z, // 相机目标 z 坐标
+                delay: 0.3, // 延迟一定时间后开始动画
+                duration: 2, // 动画持续时间
+                ease: "power2.inOut", // 缓动函数
+                onUpdate: () => {
+                  this.camera.lookAt(targetLookAt);
+                },
+              })
+              .then(() => {
+                animationEnd = true;
+              });
+          }
         }
 
-        initModel() {
+        async initModel() {
           try {
             // 创建组
             this.mapGroup = new THREE.Group();
             // 标签 初始化
             this.css2dRender = initCSS2DRender(this.options, this.container);
+            let modelData = null;
+            if (modelLevel === 1) {
+              extrudeSettings.depth = 0.4;
+              modelData = provinceData;
+            } else if (modelLevel === 2 && currentConfig) {
+              extrudeSettings.depth = 0.1;
+              // geo数据
+              modelData = await getGeoJsonByCode(currentConfig.adcode);
+            }
+            console.log("当前地图数据", modelData);
 
-            provinceData.features.forEach((elem, index) => {
+            modelData.features.forEach((elem, index) => {
               // 定一个省份 | 区对象
               const province = new THREE.Object3D();
               // 坐标
@@ -1341,12 +1280,12 @@ export default {
 
                 // 顶部和侧边材质,提出去就是控制所有,放里面可以单独设置
                 const topFaceMaterial = new THREE.MeshPhongMaterial({
-                  map: textureMap,
+                  map: modelLevel === 1 ? textureMap : null,
                   color: 0x202826,
                   combine: THREE.MultiplyOperation,
                   side: THREE.DoubleSide,
                   transparent: true,
-                  opacity: 1,
+                  opacity: modelLevel === 1 ? 1 : 0.9,
                 });
                 const sideMaterial = new THREE.MeshLambertMaterial({
                   color: 0x528fa3,
@@ -1382,26 +1321,46 @@ export default {
               // 将每个省份 | 区的地图对象添加到总的地图组 mapGroup 中
               this.mapGroup.add(province);
               // 创建标点和标签
-              initLabel(currentConfig, this.scene);
+              initLabel(currentConfig, this.scene, this.mapGroup);
               // initMark(currentConfig, this.scene);
             });
             // 创建上下边框
-            initBorderLine(provinceData, this.mapGroup);
+            initBorderLine(modelData, this.mapGroup);
             console.log("this.mapGroup", this.mapGroup);
 
             let earthGroupBound = getBoundingBox(this.mapGroup);
             centerXY = [earthGroupBound.center.x, earthGroupBound.center.y];
+            if (modelLevel === 2 && currentConfig) {
+              currentConfig.cameraSite = [
+                earthGroupBound.center.x,
+                earthGroupBound.center.y,
+                earthGroupBound.center.z,
+              ];
+              this.camera.lookAt(
+                new THREE.Vector3(...currentConfig.cameraSite)
+              );
+            } else {
+              // 这可以调节动画开始时的视角
+              this.camera.position.set(102.49, 11.97, 22.95);
+              this.camera.lookAt(new THREE.Vector3(...centerXY, 0));
+            }
+
             // centerXY = [107, 30];
             let { size } = earthGroupBound;
             let width = size.x < size.y ? size.y + 1 : size.x + 1;
             // 添加背景，修饰元素
             this.rotatingApertureMesh = guiParams.rotatingApertureMesh =
-              initRotatingAperture(this.scene, width);
+              initRotatingAperture(this.scene, width, this.mapGroup);
             this.rotatingPointMesh = guiParams.rotatingPointMesh =
-              initRotatingPoint(this.scene, width - 2);
+              initRotatingPoint(
+                this.scene,
+                modelLevel === 1 ? width - 2 : width - 0.5,
+                this.mapGroup
+              );
             this.circlePointMesh = guiParams.circlePointMesh = initCirclePoint(
               this.scene,
-              width
+              width,
+              this.mapGroup
             );
             this.rotatingApertureMesh.visible =
               this.rotatingPointMesh.visible =
@@ -1412,7 +1371,7 @@ export default {
               initSceneImag(this.scene, "/data/map/scene-bg2.png", 0.063);
               // initSceneBg(this.scene, 40);
             }
-            initChinaOutline(this.scene);
+            initChinaOutline(this.scene, this.mapGroup);
             // console.log(ChinaOutlineParams);
 
             // 将组添加到场景中
@@ -1429,10 +1388,34 @@ export default {
         }
         getDataRenderMap() {}
 
-        destroy() {}
+        destroy() {
+          // 清除场景中的所有对象
+          this.mapGroup.traverse((obj) => {
+            // 弹框、标牌等这些为CSS2D和CSS3D对象，要清除其在页面中的dom元素
+            if (obj.element) {
+              if (obj.element.parentNode)
+                obj.element.parentNode.removeChild(obj.element);
+            }
+            if (obj.type === "Mesh" || obj.type === "Line") {
+              if (obj.geometry.dispose) obj.geometry.dispose();
+              if (obj.material[0]) {
+                obj.material[0].dispose();
+                obj.material[1].dispose();
+              }
+              if (obj.material.dispose) obj.material.dispose();
+              if (obj.material.texture && obj.material.texture.dispose)
+                obj.material.texture.dispose();
+            }
+          });
+          this.mapGroup.children = [];
+          temp.splice(0, temp.length);
+          this.scene.remove(this.mapGroup);
+        }
         initControls() {
           super.initControls();
-          this.controls.target = new THREE.Vector3(...centerXY, 0);
+          if (this.options.controls.visibel) {
+            this.controls.target = new THREE.Vector3(...centerXY, 0);
+          }
         }
         initLight() {
           //   平行光1
@@ -1495,10 +1478,53 @@ export default {
             this.loop();
           });
           // 这里是你自己业务上需要的code
+          if (ChinaOutlineParams.topGeometry && animationEnd) {
+            // // 逐渐增加进度，控制线段的显现
+            // ChinaOutlineParams.lineProgress += 0.005; // 每次帧增加进度，调整速度
+
+            // if (ChinaOutlineParams.lineProgress >= 0.99) {
+            //   ChinaOutlineParams.lineProgress = 0; // 重置进度，或者可以做其它逻辑
+            // }
+
+            // // 计算当前应该显示到哪个点
+            // let currentPoints = [];
+            // let segmentCount = Math.floor(
+            //   ChinaOutlineParams.lineProgress *
+            //     ChinaOutlineParams.Vector3Lines.length
+            // ); // 当前绘制到第多少个点
+
+            // for (let i = 0; i < segmentCount; i++) {
+            //   currentPoints.push(ChinaOutlineParams.Vector3Lines[i]);
+            // }
+
+            // // 更新几何体的顶点数据
+            // ChinaOutlineParams.topGeometry.setFromPoints(currentPoints);
+
+            // 方案2.2
+            const segmentLength = modelLevel === 1 ? 200 : 50; // 每次绘制点
+            const speed = modelLevel === 1 ? 3 : 1; // 每次帧增加进度，调整速度
+
+            // 计算当前应该显示到哪个点
+            const currentPoints = [];
+            for (let i = 0; i < segmentLength; i++) {
+              // 计算索引，如果超过点集的长度则从前面取
+              let pointIndex =
+                (ChinaOutlineParams.lineProgress + i) %
+                ChinaOutlineParams.Vector3Lines.length;
+              currentPoints.push(ChinaOutlineParams.Vector3Lines[pointIndex]);
+            }
+
+            ChinaOutlineParams.lineProgress =
+              (ChinaOutlineParams.lineProgress + speed) %
+              ChinaOutlineParams.Vector3Lines.length; // 每次更新时索引增加，超过点集长度则从0重新开始
+
+            // 更新几何体的顶点数据
+            ChinaOutlineParams.topGeometry.setFromPoints(currentPoints);
+          }
 
           // 在每一帧渲染之后获取相机的实时位置
-          // var cameraPosition = this.camera.position.clone();
-          // console.log("Camera Position:", cameraPosition);
+          var cameraPosition = this.camera.position.clone();
+          console.log("Camera Position:", cameraPosition);
 
           this.renderer.render(this.scene, this.camera);
           // 控制相机旋转缩放的更新
@@ -1549,6 +1575,7 @@ export default {
         container: "#app-32-map",
         axesVisibel: false,
         controls: {
+          visibel: false,
           enableDamping: true, // 阻尼
           maxPolarAngle: (Math.PI / 2) * 0.98,
         },
@@ -1572,7 +1599,7 @@ export default {
 
       // 点击事件
       pointerClickHandler = (event) => {
-        if (!animationEnd) return;
+        if (!animationEnd || modelLevel === 2) return;
         onPointerClick(event, {
           renderer: baseEarth.renderer,
           scene: baseEarth.scene,
@@ -1582,6 +1609,20 @@ export default {
       baseEarth.renderer.domElement.addEventListener(
         "click",
         pointerClickHandler
+      );
+
+      // 右键单击事件
+      rightClickHandler = (event) => {
+        if (!animationEnd || event.button != 2 || modelLevel === 1) return;
+        onRightClick(event, {
+          renderer: baseEarth.renderer,
+          scene: baseEarth.scene,
+          camera: baseEarth.camera,
+        });
+      };
+      baseEarth.renderer.domElement.addEventListener(
+        "mousedown",
+        rightClickHandler
       );
     });
     onBeforeUnmount(() => {
@@ -1593,6 +1634,10 @@ export default {
       baseEarth.renderer.domElement.removeEventListener(
         "click",
         pointerClickHandler
+      );
+      baseEarth.renderer.domElement.removeEventListener(
+        "mousedown",
+        rightClickHandler
       );
     });
 
